@@ -1,0 +1,2164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Crewing_AppraisalAdditionalRating {
+  Id          String    @id(map: "PK_Crewing_AppraisalAdditionalRating") @db.UniqueIdentifier
+  Name        String    @db.NVarChar(250)
+  SequenceNo  Int?
+  Created     DateTime
+  CreatedBy   String    @db.NVarChar(Max)
+  IsDeleted   Boolean
+  Modified    DateTime?
+  ModifiedBy  String?   @db.NVarChar(Max)
+  Description String?   @db.NVarChar(500)
+}
+
+model Crewing_AppraisalMandatoryRating {
+  Id          String    @id(map: "PK_Crewing_AppraisalMandatoryRating") @db.UniqueIdentifier
+  Name        String    @db.NVarChar(250)
+  SequenceNo  Int?
+  Created     DateTime
+  CreatedBy   String    @db.NVarChar(Max)
+  IsDeleted   Boolean
+  Modified    DateTime?
+  ModifiedBy  String?   @db.NVarChar(Max)
+  Description String?   @db.NVarChar(500)
+}
+
+model Crewing_AppraisalTraining {
+  Id           String    @id(map: "PK_Crewing_AppraisalTraining") @db.UniqueIdentifier
+  CourseRank   String    @db.NVarChar(250)
+  TrainingName String    @db.NVarChar(250)
+  SequenceNo   Int?
+  Created      DateTime
+  CreatedBy    String    @db.NVarChar(Max)
+  IsDeleted    Boolean
+  Modified     DateTime?
+  ModifiedBy   String?   @db.NVarChar(Max)
+}
+
+model Crewing_AssessmentHistory {
+  Id                            String                         @id(map: "PK_Crewing_AssessmentHistory") @db.UniqueIdentifier
+  AssessmentType                String                         @db.VarChar(50)
+  Schedule                      DateTime?
+  Location                      String?                        @db.VarChar(250)
+  AssessmentStatus              String                         @db.VarChar(50)
+  Score                         String?                        @db.VarChar(50)
+  Note                          String?                        @db.VarChar(500)
+  BOCResultStatus               String?                        @db.VarChar(50)
+  BOCDocument                   String?                        @db.VarChar(250)
+  ClinicName                    String?                        @db.VarChar(250)
+  ClinicLocation                String?                        @db.VarChar(250)
+  InterviewAssessorId           String?                        @db.UniqueIdentifier
+  RegisterCrewId                String?                        @db.UniqueIdentifier
+  MCUPackageId                  String?                        @db.UniqueIdentifier
+  FileId                        String?                        @db.UniqueIdentifier
+  Created                       DateTime
+  CreatedBy                     String                         @db.NVarChar(Max)
+  IsDeleted                     Boolean
+  Modified                      DateTime?
+  ModifiedBy                    String?                        @db.NVarChar(Max)
+  BOCUploadDocument             String?                        @db.VarChar(250)
+  BOCUploadDocumentId           String?                        @db.UniqueIdentifier
+  MCUHealthDegreeId             String?                        @db.UniqueIdentifier
+  SupervisorReviewUserId        String?                        @db.UniqueIdentifier
+  Crewing_InterviewAssessor     Crewing_InterviewAssessor?     @relation(fields: [InterviewAssessorId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_AssessmentHistory_Crewing_InterviewAssessor_InterviewAssessorId")
+  Crewing_MCUHealthStatusDegree Crewing_MCUHealthStatusDegree? @relation(fields: [MCUHealthDegreeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_AssessmentHistory_Crewing_MCUHealthStatusDegree_MCUHealthDegreeId")
+  Crewing_MCUPackages           Crewing_MCUPackages?           @relation(fields: [MCUPackageId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_AssessmentHistory_Crewing_MCUPackages_MCUPackageId")
+  Crewing_RegisterCrew          Crewing_RegisterCrew?          @relation(fields: [RegisterCrewId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_AssessmentHistory_Crewing_RegisterCrew_RegisterCrewId")
+  Crewing_Users                 Crewing_Users?                 @relation(fields: [SupervisorReviewUserId], references: [UserId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_AssessmentHistory_Crewing_Users_SupervisorReviewUserId")
+
+  @@index([InterviewAssessorId], map: "IX_Crewing_AssessmentHistory_InterviewAssessorId")
+  @@index([MCUHealthDegreeId], map: "IX_Crewing_AssessmentHistory_MCUHealthDegreeId")
+  @@index([MCUPackageId], map: "IX_Crewing_AssessmentHistory_MCUPackageId")
+  @@index([RegisterCrewId], map: "IX_Crewing_AssessmentHistory_RegisterCrewId")
+  @@index([SupervisorReviewUserId], map: "IX_Crewing_AssessmentHistory_SupervisorReviewUserId")
+}
+
+model Crewing_Bank {
+  Id                                                                 String                 @id(map: "PK_Crewing_Bank") @db.UniqueIdentifier
+  BankName                                                           String?                @db.VarChar(50)
+  Created                                                            DateTime
+  CreatedBy                                                          String                 @db.NVarChar(Max)
+  IsDeleted                                                          Boolean
+  Modified                                                           DateTime?
+  ModifiedBy                                                         String?                @db.NVarChar(Max)
+  Crewing_Employee_Crewing_Employee_BankId1ToCrewing_Bank            Crewing_Employee[]     @relation("Crewing_Employee_BankId1ToCrewing_Bank")
+  Crewing_Employee_Crewing_Employee_BankId2ToCrewing_Bank            Crewing_Employee[]     @relation("Crewing_Employee_BankId2ToCrewing_Bank")
+  Crewing_RegisterCrew_Crewing_RegisterCrew_RegBankId1ToCrewing_Bank Crewing_RegisterCrew[] @relation("Crewing_RegisterCrew_RegBankId1ToCrewing_Bank")
+  Crewing_RegisterCrew_Crewing_RegisterCrew_RegBankId2ToCrewing_Bank Crewing_RegisterCrew[] @relation("Crewing_RegisterCrew_RegBankId2ToCrewing_Bank")
+}
+
+model Crewing_BJSTType {
+  Id                              String                            @id(map: "PK_Crewing_BJSTType") @db.UniqueIdentifier
+  BJSTTypeName                    String?                           @db.VarChar(150)
+  Created                         DateTime
+  CreatedBy                       String                            @db.NVarChar(Max)
+  IsDeleted                       Boolean
+  Modified                        DateTime?
+  ModifiedBy                      String?                           @db.NVarChar(Max)
+  Score                           String?                           @db.NVarChar(50)
+  Crewing_EmployeePreparationBJST Crewing_EmployeePreparationBJST[]
+  Crewing_JobPositionMarine       Crewing_JobPositionMarine[]
+  Crewing_JobPositionTanker       Crewing_JobPositionTanker[]
+}
+
+model Crewing_City {
+  Id                 String               @id(map: "PK_Crewing_City") @db.UniqueIdentifier
+  CityName           String?              @db.VarChar(50)
+  Created            DateTime
+  CreatedBy          String               @db.NVarChar(Max)
+  IsDeleted          Boolean
+  Modified           DateTime?
+  ModifiedBy         String?              @db.NVarChar(Max)
+  Crewing_JobOpening Crewing_JobOpening[]
+}
+
+model Crewing_COCMarine {
+  COCId                   Int                       @id(map: "PK_Crewing_COCMarine") @default(autoincrement())
+  COCName                 String?                   @db.VarChar(50)
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Id                      String                    @db.UniqueIdentifier
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_MatrixMarineCOC Crewing_MatrixMarineCOC[]
+}
+
+model Crewing_COCTanker {
+  COCId                   Int                       @id(map: "PK_Crewing_COCTanker") @default(autoincrement())
+  COCName                 String?                   @db.VarChar(50)
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Id                      String                    @db.UniqueIdentifier
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_MatrixTankerCOC Crewing_MatrixTankerCOC[]
+}
+
+model Crewing_ContractManagement {
+  Id                     String              @id(map: "PK_Crewing_ContractManagement") @db.UniqueIdentifier
+  ClientId               String?             @db.UniqueIdentifier
+  ContractName           String?             @db.NVarChar(500)
+  ContractDate           DateTime?
+  Created                DateTime
+  CreatedBy              String              @db.NVarChar(Max)
+  IsDeleted              Boolean
+  Modified               DateTime?
+  ModifiedBy             String?             @db.NVarChar(Max)
+  ContractAttachmentId   String?             @db.UniqueIdentifier
+  ContractAttachmentName String?             @db.NVarChar(Max)
+  ContractExpiryDate     DateTime?
+  Crewing_Principals     Crewing_Principals? @relation(fields: [ClientId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_ContractManagement_Crewing_Principals_ClientId")
+
+  @@index([ClientId], map: "IX_Crewing_ContractManagement_ClientId")
+}
+
+model Crewing_COPMarine {
+  COPId                   Int                       @id(map: "PK_Crewing_COPMarine") @default(autoincrement())
+  COPName                 String?                   @db.VarChar(50)
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Id                      String                    @db.UniqueIdentifier
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_MatrixMarineCOP Crewing_MatrixMarineCOP[]
+}
+
+model Crewing_COPTanker {
+  COPId                   Int                       @id(map: "PK_Crewing_COPTanker") @default(autoincrement())
+  COPType                 String?                   @db.VarChar(250)
+  COPSubType              String?                   @db.VarChar(250)
+  COPName                 String?                   @db.VarChar(250)
+  Regulation              String?                   @db.VarChar(250)
+  MinValidityType         String?                   @db.VarChar(50)
+  MinValidityValue        Int?
+  RevalidationType        String?                   @db.VarChar(50)
+  RevalidationValue       Int?
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Id                      String                    @db.UniqueIdentifier
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_MatrixTankerCOP Crewing_MatrixTankerCOP[]
+}
+
+model Crewing_Degree {
+  Id         String    @id(map: "PK_Crewing_Degree") @db.UniqueIdentifier
+  DegreeName String?   @db.VarChar(50)
+  Created    DateTime
+  CreatedBy  String    @db.NVarChar(Max)
+  IsDeleted  Boolean
+  Modified   DateTime?
+  ModifiedBy String?   @db.NVarChar(Max)
+}
+
+model Crewing_DesignatedPersonAshore {
+  Id                         String    @id(map: "PK_Crewing_DesignatedPersonAshore") @db.UniqueIdentifier
+  DesignatedPersonAshoreName String?   @db.VarChar(100)
+  Created                    DateTime
+  CreatedBy                  String    @db.NVarChar(Max)
+  IsDeleted                  Boolean
+  Modified                   DateTime?
+  ModifiedBy                 String?   @db.NVarChar(Max)
+}
+
+model Crewing_Division {
+  DivisionId           Int                    @id(map: "PK_Crewing_Division") @default(autoincrement())
+  DivisionName         String?                @db.NVarChar(50)
+  DivisionCode         String?                @db.NVarChar(50)
+  Created              DateTime
+  CreatedBy            String                 @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Id                   String                 @db.UniqueIdentifier
+  Modified             DateTime?
+  ModifiedBy           String?                @db.NVarChar(Max)
+  Crewing_Employee     Crewing_Employee[]
+  Crewing_JobOpening   Crewing_JobOpening[]
+  Crewing_RegisterCrew Crewing_RegisterCrew[]
+  Crewing_Ship         Crewing_Ship[]
+  Crewing_Users        Crewing_Users[]
+  Crewing_Vessel       Crewing_Vessel[]
+}
+
+model Crewing_EmailLog {
+  Id                String    @id(map: "PK_Crewing_EmailLog") @db.UniqueIdentifier
+  SendEmailType     String?   @db.NVarChar(50)
+  To                String?   @db.NVarChar(250)
+  Body              String?   @db.NVarChar(Max)
+  Created           DateTime
+  CreatedBy         String    @db.NVarChar(Max)
+  IsDeleted         Boolean
+  Modified          DateTime?
+  ModifiedBy        String?   @db.NVarChar(Max)
+  DataIds           String?   @db.NVarChar(500)
+  SendEmailCategory String?   @db.NVarChar(50)
+  Subject           String?   @db.NVarChar(Max)
+}
+
+model Crewing_Employee {
+  Id                                                                            String                               @id(map: "PK_Crewing_Employee") @db.UniqueIdentifier
+  FullName                                                                      String?                              @db.NVarChar(250)
+  Address                                                                       String?                              @db.NVarChar(500)
+  Email                                                                         String?                              @db.NVarChar(250)
+  Gender                                                                        String?                              @db.NVarChar(250)
+  PlaceOfBirth                                                                  String?                              @db.NVarChar(250)
+  DateOfBirth                                                                   DateTime?
+  ReligionId                                                                    String?                              @db.UniqueIdentifier
+  Nationality                                                                   String?                              @db.NVarChar(250)
+  PhotoId                                                                       String?                              @db.UniqueIdentifier
+  PassportPhotoId                                                               String?                              @db.UniqueIdentifier
+  KtpPhotoId                                                                    String?                              @db.UniqueIdentifier
+  IdCardNo                                                                      String?                              @db.NVarChar(250)
+  IdPassport                                                                    String?                              @db.NVarChar(Max)
+  FamilyCardNo                                                                  String?                              @db.NVarChar(250)
+  NPWP                                                                          String?                              @db.NVarChar(250)
+  BPJSKesNo                                                                     String?                              @db.NVarChar(250)
+  BPJSTKNo                                                                      String?                              @db.NVarChar(250)
+  PhoneNo                                                                       String?                              @db.NVarChar(250)
+  RelativesName                                                                 String?                              @db.NVarChar(250)
+  RelativesEmail                                                                String?                              @db.NVarChar(250)
+  RelativesPhone                                                                String?                              @db.NVarChar(250)
+  RelativesAddress                                                              String?                              @db.NVarChar(250)
+  BankAccount1                                                                  String?                              @db.NVarChar(250)
+  BankId1                                                                       String?                              @db.UniqueIdentifier
+  BankAccountName1                                                              String?                              @db.NVarChar(250)
+  BankAccount2                                                                  String?                              @db.NVarChar(250)
+  BankId2                                                                       String?                              @db.UniqueIdentifier
+  BankAccountName2                                                              String?                              @db.NVarChar(250)
+  DivisionId                                                                    Int?
+  EmployeeIdNumber                                                              String?                              @db.NVarChar(250)
+  OnBoardStatus                                                                 Boolean?
+  ShipId                                                                        Int?
+  MaritalStatusId                                                               String?                              @db.UniqueIdentifier
+  SeaFarerId                                                                    String?                              @db.NVarChar(250)
+  RegisterCrewId                                                                String?                              @db.UniqueIdentifier
+  IsResigned                                                                    Boolean
+  EmploymentTypeId                                                              String?                              @db.UniqueIdentifier
+  JobPositionMarineId                                                           Int?
+  JobPositionTankerId                                                           Int?
+  LastRejectedDate                                                              DateTime?
+  WilingToAcceptLowerRank                                                       Boolean?
+  AvailableForm                                                                 DateTime?
+  AvailableUntil                                                                DateTime?
+  Weight                                                                        String?                              @db.NVarChar(50)
+  Height                                                                        String?                              @db.NVarChar(50)
+  BMI                                                                           String?                              @db.NVarChar(50)
+  SafetyShoesSize                                                               String?                              @db.NVarChar(250)
+  TrousersSize                                                                  String?                              @db.NVarChar(250)
+  CoverallSize                                                                  String?                              @db.NVarChar(250)
+  ShirtSize                                                                     String?                              @db.NVarChar(250)
+  Created                                                                       DateTime
+  CreatedBy                                                                     String                               @db.NVarChar(Max)
+  IsDeleted                                                                     Boolean
+  Modified                                                                      DateTime?
+  ModifiedBy                                                                    String?                              @db.NVarChar(Max)
+  SeamanBookNo                                                                  String?                              @db.NVarChar(250)
+  Crewing_Bank_Crewing_Employee_BankId1ToCrewing_Bank                           Crewing_Bank?                        @relation("Crewing_Employee_BankId1ToCrewing_Bank", fields: [BankId1], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_Bank_BankId1")
+  Crewing_Bank_Crewing_Employee_BankId2ToCrewing_Bank                           Crewing_Bank?                        @relation("Crewing_Employee_BankId2ToCrewing_Bank", fields: [BankId2], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_Bank_BankId2")
+  Crewing_Division                                                              Crewing_Division?                    @relation(fields: [DivisionId], references: [DivisionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_Division_DivisionId")
+  Crewing_EmploymentType                                                        Crewing_EmploymentType?              @relation(fields: [EmploymentTypeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_EmploymentType_EmploymentTypeId")
+  Crewing_JobPositionMarine                                                     Crewing_JobPositionMarine?           @relation(fields: [JobPositionMarineId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_JobPositionMarine_JobPositionMarineId")
+  Crewing_JobPositionTanker                                                     Crewing_JobPositionTanker?           @relation(fields: [JobPositionTankerId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_JobPositionTanker_JobPositionTankerId")
+  Crewing_MaritalStatus                                                         Crewing_MaritalStatus?               @relation(fields: [MaritalStatusId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_MaritalStatus_MaritalStatusId")
+  Crewing_Religion                                                              Crewing_Religion?                    @relation(fields: [ReligionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_Religion_ReligionId")
+  Crewing_Ship                                                                  Crewing_Ship?                        @relation(fields: [ShipId], references: [ShipId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Employee_Crewing_Ship_ShipId")
+  Crewing_EmployeeAppraisal                                                     Crewing_EmployeeAppraisal[]
+  Crewing_EmployeeBlacklist                                                     Crewing_EmployeeBlacklist[]
+  Crewing_EmployeeBoardSchedule                                                 Crewing_EmployeeBoardSchedule[]
+  Crewing_EmployeeCOCDoc                                                        Crewing_EmployeeCOCDoc[]
+  Crewing_EmployeeCOPDoc                                                        Crewing_EmployeeCOPDoc[]
+  Crewing_EmployeeEducation                                                     Crewing_EmployeeEducation[]
+  Crewing_EmployeeFamily                                                        Crewing_EmployeeFamily[]
+  Crewing_EmployeeMedicalCertificate                                            Crewing_EmployeeMedicalCertificate[]
+  Crewing_EmployeePreparationBJST                                               Crewing_EmployeePreparationBJST[]
+  Crewing_EmployeePreparationMCU                                                Crewing_EmployeePreparationMCU[]
+  Crewing_EmployeePreparationMedical                                            Crewing_EmployeePreparationMedical[]
+  Crewing_EmployeePreparationPKL                                                Crewing_EmployeePreparationPKL[]
+  Crewing_EmployeeScheduling                                                    Crewing_EmployeeScheduling[]
+  Crewing_EmployeeSeaService                                                    Crewing_EmployeeSeaService[]
+  Crewing_EmployeeTraining                                                      Crewing_EmployeeTraining[]
+  Crewing_EmployeeTravelDoc                                                     Crewing_EmployeeTravelDoc[]
+  Crewing_VesselCrew_Crewing_VesselCrew_CurrentEmployeeIdToCrewing_Employee     Crewing_VesselCrew[]                 @relation("Crewing_VesselCrew_CurrentEmployeeIdToCrewing_Employee")
+  Crewing_VesselCrew_Crewing_VesselCrew_NextButOneEmployeeIdToCrewing_Employee  Crewing_VesselCrew[]                 @relation("Crewing_VesselCrew_NextButOneEmployeeIdToCrewing_Employee")
+  Crewing_VesselCrew_Crewing_VesselCrew_NextEmployeeIdToCrewing_Employee        Crewing_VesselCrew[]                 @relation("Crewing_VesselCrew_NextEmployeeIdToCrewing_Employee")
+  Crewing_VesselCrew_Crewing_VesselCrew_PrePreviousEmployeeIdToCrewing_Employee Crewing_VesselCrew[]                 @relation("Crewing_VesselCrew_PrePreviousEmployeeIdToCrewing_Employee")
+  Crewing_VesselCrew_Crewing_VesselCrew_PreviousEmployeeIdToCrewing_Employee    Crewing_VesselCrew[]                 @relation("Crewing_VesselCrew_PreviousEmployeeIdToCrewing_Employee")
+  Crewing_VesselCrewRejection                                                   Crewing_VesselCrewRejection[]
+  Crewing_VesselGanttChart                                                      Crewing_VesselGanttChart[]
+
+  @@index([BankId1], map: "IX_Crewing_Employee_BankId1")
+  @@index([BankId2], map: "IX_Crewing_Employee_BankId2")
+  @@index([DivisionId], map: "IX_Crewing_Employee_DivisionId")
+  @@index([EmploymentTypeId], map: "IX_Crewing_Employee_EmploymentTypeId")
+  @@index([JobPositionMarineId], map: "IX_Crewing_Employee_JobPositionMarineId")
+  @@index([JobPositionTankerId], map: "IX_Crewing_Employee_JobPositionTankerId")
+  @@index([MaritalStatusId], map: "IX_Crewing_Employee_MaritalStatusId")
+  @@index([ReligionId], map: "IX_Crewing_Employee_ReligionId")
+  @@index([ShipId], map: "IX_Crewing_Employee_ShipId")
+}
+
+model Crewing_EmployeeAppraisal {
+  Id                                     String           @id(map: "PK_Crewing_EmployeeAppraisal") @db.UniqueIdentifier
+  EmployeeId                             String           @db.UniqueIdentifier
+  SuitableForThisTypeOfVesselTrade       String?          @db.NVarChar(250)
+  Created                                DateTime
+  CreatedBy                              String           @db.NVarChar(Max)
+  IsDeleted                              Boolean
+  Modified                               DateTime?
+  ModifiedBy                             String?          @db.NVarChar(Max)
+  SeafarersName                          String?          @db.NVarChar(250)
+  VesselName                             String?          @db.NVarChar(250)
+  SuitableForThisTypeOfVesselTradeReason String?          @db.NVarChar(500)
+  CourseRank                             String?          @db.NVarChar(250)
+  CrewRank                               String?          @db.NVarChar(250)
+  DateOfBirth                            DateTime?
+  DateOfReport                           DateTime?
+  IsActive                               Boolean?
+  Master                                 String?          @db.NVarChar(250)
+  Nationality                            String?          @db.NVarChar(250)
+  ToBeReemployed                         String?          @db.NVarChar(250)
+  ToBeReemployedReason                   String?          @db.NVarChar(500)
+  Promote                                String?          @db.NVarChar(250)
+  PromoteReason                          String?          @db.NVarChar(500)
+  ReasonForTheReport                     String?          @db.NVarChar(250)
+  ReemployInCurrentRank                  String?          @db.NVarChar(250)
+  ReemployInCurrentRankReason            String?          @db.NVarChar(500)
+  ReportingOfficer                       String?          @db.NVarChar(250)
+  ReportingOfficerRank                   String?          @db.NVarChar(250)
+  ReportingPeriodTo                      String?          @db.NVarChar(250)
+  ReportingStatus                        String?          @db.NVarChar(250)
+  ReviewStatus                           String?          @db.NVarChar(250)
+  SeafarersRatingAdditional              String?          @db.NVarChar(Max)
+  SeafarersRatingAdditionalAverageScore  Decimal?         @db.Decimal(6, 2)
+  SeafarersRatingMandatory               String?          @db.NVarChar(Max)
+  SeafarersRatingMandatoryAverageScore   Decimal?         @db.Decimal(6, 2)
+  TrainingList                           String?          @db.NVarChar(Max)
+  ReportingPeriodFrom                    String?          @db.NVarChar(250)
+  VesselId                               String?          @db.UniqueIdentifier
+  NeedRevisionReason                     String?          @db.NVarChar(Max)
+  RevisionNumber                         Int              @default(0, map: "DF__Crewing_E__Revis__02C769E9")
+  Crewing_Employee                       Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeAppraisal_Crewing_Employee_EmployeeId")
+  Crewing_Vessel                         Crewing_Vessel?  @relation(fields: [VesselId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeAppraisal_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeAppraisal_EmployeeId")
+  @@index([VesselId], map: "IX_Crewing_EmployeeAppraisal_VesselId")
+}
+
+model Crewing_EmployeeBlacklist {
+  Id                             String                         @id(map: "PK_Crewing_EmployeeBlacklist") @db.UniqueIdentifier
+  EmployeeId                     String                         @db.UniqueIdentifier
+  EmployeeBlacklistLevelId       Int
+  StartDate                      DateTime?
+  EndDate                        DateTime?
+  Created                        DateTime
+  CreatedBy                      String                         @db.NVarChar(Max)
+  IsDeleted                      Boolean
+  Modified                       DateTime?
+  ModifiedBy                     String?                        @db.NVarChar(Max)
+  Crewing_Employee               Crewing_Employee               @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeBlacklist_Crewing_Employee_EmployeeId")
+  Crewing_EmployeeBlacklistLevel Crewing_EmployeeBlacklistLevel @relation(fields: [EmployeeBlacklistLevelId], references: [EmployeeBlacklistLevelId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeBlacklist_Crewing_EmployeeBlacklistLevel_EmployeeBlacklistLevelId")
+
+  @@index([EmployeeBlacklistLevelId], map: "IX_Crewing_EmployeeBlacklist_EmployeeBlacklistLevelId")
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeBlacklist_EmployeeId")
+}
+
+model Crewing_EmployeeBlacklistLevel {
+  EmployeeBlacklistLevelId  Int                         @id(map: "PK_Crewing_EmployeeBlacklistLevel") @default(autoincrement())
+  Name                      String                      @db.NVarChar(Max)
+  Description               String                      @db.NVarChar(Max)
+  MonthDuration             Int?
+  Created                   DateTime
+  CreatedBy                 String                      @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Id                        String                      @db.UniqueIdentifier
+  Modified                  DateTime?
+  ModifiedBy                String?                     @db.NVarChar(Max)
+  Crewing_EmployeeBlacklist Crewing_EmployeeBlacklist[]
+}
+
+model Crewing_EmployeeBoardSchedule {
+  Id                        String                     @id(map: "PK_Crewing_EmployeeBoardSchedule") @db.UniqueIdentifier
+  EmployeeId                String                     @db.UniqueIdentifier
+  OnBoardDate               DateTime
+  OffBoardDate              DateTime
+  IsActive                  Boolean
+  VesselId                  String                     @db.UniqueIdentifier
+  JobPositionMarineId       Int?
+  JobPositionTankerId       Int?
+  Created                   DateTime
+  CreatedBy                 String                     @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Modified                  DateTime?
+  ModifiedBy                String?                    @db.NVarChar(Max)
+  IsOnBoard                 Boolean                    @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_E__IsOnB__03BB8E22")
+  OriginalOffBoardDate      DateTime?
+  Crewing_Employee          Crewing_Employee           @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeBoardSchedule_Crewing_Employee_EmployeeId")
+  Crewing_JobPositionMarine Crewing_JobPositionMarine? @relation(fields: [JobPositionMarineId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeBoardSchedule_Crewing_JobPositionMarine_JobPositionMarineId")
+  Crewing_JobPositionTanker Crewing_JobPositionTanker? @relation(fields: [JobPositionTankerId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeBoardSchedule_Crewing_JobPositionTanker_JobPositionTankerId")
+  Crewing_Vessel            Crewing_Vessel             @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeBoardSchedule_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeBoardSchedule_EmployeeId")
+  @@index([JobPositionMarineId], map: "IX_Crewing_EmployeeBoardSchedule_JobPositionMarineId")
+  @@index([JobPositionTankerId], map: "IX_Crewing_EmployeeBoardSchedule_JobPositionTankerId")
+  @@index([VesselId], map: "IX_Crewing_EmployeeBoardSchedule_VesselId")
+}
+
+model Crewing_EmployeeCOCDoc {
+  Id               String           @id(map: "PK_Crewing_EmployeeCOCDoc") @db.UniqueIdentifier
+  EmployeeId       String           @db.UniqueIdentifier
+  COCName          String?          @db.NVarChar(250)
+  COCNumber        String?          @db.NVarChar(250)
+  COCId            Int?
+  COCPublishedDate DateTime?
+  COCExpiryDate    DateTime?
+  COCDescription   String?          @db.NVarChar(500)
+  COCAttachment    String?          @db.UniqueIdentifier
+  Created          DateTime
+  CreatedBy        String           @db.NVarChar(Max)
+  IsDeleted        Boolean
+  Modified         DateTime?
+  ModifiedBy       String?          @db.NVarChar(Max)
+  Crewing_Employee Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeCOCDoc_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeCOCDoc_EmployeeId")
+}
+
+model Crewing_EmployeeCOPDoc {
+  Id               String           @id(map: "PK_Crewing_EmployeeCOPDoc") @db.UniqueIdentifier
+  EmployeeId       String           @db.UniqueIdentifier
+  COPName          String?          @db.NVarChar(250)
+  COPNumber        String?          @db.NVarChar(250)
+  COPId            Int?
+  COPPublishedDate DateTime?
+  COPExpiryDate    DateTime?
+  COPDescription   String?          @db.NVarChar(500)
+  COPAttachment    String?          @db.UniqueIdentifier
+  Created          DateTime
+  CreatedBy        String           @db.NVarChar(Max)
+  IsDeleted        Boolean
+  Modified         DateTime?
+  ModifiedBy       String?          @db.NVarChar(Max)
+  Crewing_Employee Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeCOPDoc_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeCOPDoc_EmployeeId")
+}
+
+model Crewing_EmployeeEducation {
+  Id               String           @id(map: "PK_Crewing_EmployeeEducation") @db.UniqueIdentifier
+  EmployeeId       String           @db.UniqueIdentifier
+  EduSchool        String?          @db.NVarChar(250)
+  EduDegree        String?          @db.NVarChar(250)
+  EduMajor         String?          @db.NVarChar(250)
+  EduGPA           Decimal?         @db.Decimal(18, 3)
+  EduYearAdmission Int?
+  EduYearGraduate  Int?
+  EduCity          String?          @db.NVarChar(250)
+  Created          DateTime
+  CreatedBy        String           @db.NVarChar(Max)
+  IsDeleted        Boolean
+  Modified         DateTime?
+  ModifiedBy       String?          @db.NVarChar(Max)
+  Crewing_Employee Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeEducation_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeEducation_EmployeeId")
+}
+
+model Crewing_EmployeeFamily {
+  Id                   String           @id(map: "PK_Crewing_EmployeeFamily") @db.UniqueIdentifier
+  EmployeeId           String           @db.UniqueIdentifier
+  Relationship         String?          @db.NVarChar(250)
+  Fullname             String?          @db.NVarChar(250)
+  Gender               String?          @db.NVarChar(250)
+  DateOfBirth          DateTime?
+  MobileNo             String?          @db.NVarChar(250)
+  Email                String?          @db.NVarChar(250)
+  KtpNumber            String?          @db.NVarChar(250)
+  FamilyRegisterNumber String?          @db.NVarChar(250)
+  Address              String?          @db.NVarChar(250)
+  Created              DateTime
+  CreatedBy            String           @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?          @db.NVarChar(Max)
+  Crewing_Employee     Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeFamily_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeFamily_EmployeeId")
+}
+
+model Crewing_EmployeeMedicalCertificate {
+  Id                     String           @id(map: "PK_Crewing_EmployeeMedicalCertificate") @db.UniqueIdentifier
+  EmployeeId             String           @db.UniqueIdentifier
+  MedicalCertificateName String?          @db.NVarChar(250)
+  Number                 String?          @db.NVarChar(250)
+  PlaceOfIssue           String?          @db.NVarChar(250)
+  DateOfIssue            DateTime?
+  ExpirationDate         DateTime?
+  AttachmentFileId       String?          @db.UniqueIdentifier
+  Created                DateTime
+  CreatedBy              String           @db.NVarChar(Max)
+  IsDeleted              Boolean
+  Modified               DateTime?
+  ModifiedBy             String?          @db.NVarChar(Max)
+  Crewing_Employee       Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeMedicalCertificate_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeMedicalCertificate_EmployeeId")
+}
+
+model Crewing_EmployeePreparationBJST {
+  Id                              String                           @id(map: "PK_Crewing_EmployeePreparationBJST") @db.UniqueIdentifier
+  EmployeeId                      String                           @db.UniqueIdentifier
+  VesselId                        String                           @db.UniqueIdentifier
+  BJSTTypeId                      String                           @db.UniqueIdentifier
+  StartDate                       DateTime?
+  IsScheduled                     Boolean
+  AssessmentStatus                String?                          @db.NVarChar(50)
+  LetterNumber                    String?                          @db.NVarChar(150)
+  QualificationOfTrainingId       String?                          @db.UniqueIdentifier
+  Place                           String?                          @db.NVarChar(250)
+  Manager                         String?                          @db.NVarChar(250)
+  HasBeenUsedForPKL               Boolean
+  AttachmentId                    String?                          @db.UniqueIdentifier
+  AttachmentFilename              String?                          @db.NVarChar(250)
+  Created                         DateTime
+  CreatedBy                       String                           @db.NVarChar(Max)
+  IsDeleted                       Boolean
+  Modified                        DateTime?
+  ModifiedBy                      String?                          @db.NVarChar(Max)
+  EndDate                         DateTime?
+  Crewing_BJSTType                Crewing_BJSTType                 @relation(fields: [BJSTTypeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationBJST_Crewing_BJSTType_BJSTTypeId")
+  Crewing_Employee                Crewing_Employee                 @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationBJST_Crewing_Employee_EmployeeId")
+  Crewing_QualificationOfTraining Crewing_QualificationOfTraining? @relation(fields: [QualificationOfTrainingId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationBJST_Crewing_QualificationOfTraining_QualificationOfTrainingId")
+  Crewing_Vessel                  Crewing_Vessel                   @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationBJST_Crewing_Vessel_VesselId")
+
+  @@index([BJSTTypeId], map: "IX_Crewing_EmployeePreparationBJST_BJSTTypeId")
+  @@index([EmployeeId], map: "IX_Crewing_EmployeePreparationBJST_EmployeeId")
+  @@index([QualificationOfTrainingId], map: "IX_Crewing_EmployeePreparationBJST_QualificationOfTrainingId")
+  @@index([VesselId], map: "IX_Crewing_EmployeePreparationBJST_VesselId")
+}
+
+model Crewing_EmployeePreparationMCU {
+  Id                            String                         @id(map: "PK_Crewing_EmployeePreparationMCU") @db.UniqueIdentifier
+  EmployeeId                    String                         @db.UniqueIdentifier
+  VesselId                      String                         @db.UniqueIdentifier
+  MCUPackageId                  String                         @db.UniqueIdentifier
+  Schedule                      DateTime
+  ValidUntil                    DateTime?
+  IsScheduled                   Boolean
+  AssessmentStatus              String?                        @db.NVarChar(50)
+  LetterNumber                  String?                        @db.NVarChar(50)
+  ClinicName                    String?                        @db.NVarChar(250)
+  ClinicLocation                String?                        @db.NVarChar(250)
+  AttachmentId                  String?                        @db.UniqueIdentifier
+  Created                       DateTime
+  CreatedBy                     String                         @db.NVarChar(Max)
+  IsDeleted                     Boolean
+  Modified                      DateTime?
+  ModifiedBy                    String?                        @db.NVarChar(Max)
+  AttachmentFilename            String?                        @db.NVarChar(250)
+  MCUHealthDegreeId             String?                        @db.UniqueIdentifier
+  Crewing_Employee              Crewing_Employee               @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationMCU_Crewing_Employee_EmployeeId")
+  Crewing_MCUHealthStatusDegree Crewing_MCUHealthStatusDegree? @relation(fields: [MCUHealthDegreeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationMCU_Crewing_MCUHealthStatusDegree_MCUHealthDegreeId")
+  Crewing_MCUPackages           Crewing_MCUPackages            @relation(fields: [MCUPackageId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationMCU_Crewing_MCUPackages_MCUPackageId")
+  Crewing_Vessel                Crewing_Vessel                 @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationMCU_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeePreparationMCU_EmployeeId")
+  @@index([MCUHealthDegreeId], map: "IX_Crewing_EmployeePreparationMCU_MCUHealthDegreeId")
+  @@index([MCUPackageId], map: "IX_Crewing_EmployeePreparationMCU_MCUPackageId")
+  @@index([VesselId], map: "IX_Crewing_EmployeePreparationMCU_VesselId")
+}
+
+model Crewing_EmployeePreparationMedical {
+  Id                 String           @id(map: "PK_Crewing_EmployeePreparationMedical") @db.UniqueIdentifier
+  EmployeeId         String           @db.UniqueIdentifier
+  VesselId           String           @db.UniqueIdentifier
+  PositionOnBoard    String?          @db.NVarChar(250)
+  CertificateNumber  String?          @db.NVarChar(250)
+  ExaminationDate    DateTime?
+  ValidUntil         DateTime?
+  Result             String?          @db.NVarChar(250)
+  AttachmentId       String?          @db.UniqueIdentifier
+  AttachmentFilename String?          @db.NVarChar(250)
+  Created            DateTime
+  CreatedBy          String           @db.NVarChar(Max)
+  IsDeleted          Boolean
+  Modified           DateTime?
+  ModifiedBy         String?          @db.NVarChar(Max)
+  Crewing_Employee   Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationMedical_Crewing_Employee_EmployeeId")
+  Crewing_Vessel     Crewing_Vessel   @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationMedical_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeePreparationMedical_EmployeeId")
+  @@index([VesselId], map: "IX_Crewing_EmployeePreparationMedical_VesselId")
+}
+
+model Crewing_EmployeePreparationPKL {
+  Id                         String           @id(map: "PK_Crewing_EmployeePreparationPKL") @db.UniqueIdentifier
+  EmployeeId                 String           @db.UniqueIdentifier
+  DocReleasedDate            DateTime
+  DocExpiredDate             DateTime
+  AttachmentId               String?          @db.UniqueIdentifier
+  Created                    DateTime
+  CreatedBy                  String           @db.NVarChar(Max)
+  IsDeleted                  Boolean
+  Modified                   DateTime?
+  ModifiedBy                 String?          @db.NVarChar(Max)
+  Allowances                 String?          @db.NVarChar(250)
+  AllowancesTradingOut       String?          @db.NVarChar(250)
+  AttachmentFilename         String?          @db.NVarChar(250)
+  BasicSalary                String?          @db.NVarChar(250)
+  EmployeePreparationBJSTId  String?          @db.UniqueIdentifier
+  FirstPartyName             String?          @db.NVarChar(250)
+  InitialRankAs              String?          @db.NVarChar(250)
+  LeavePay                   String?          @db.NVarChar(250)
+  PKLDocumentName            String?          @db.NVarChar(250)
+  Overtime                   String?          @db.NVarChar(250)
+  Position                   String?          @db.NVarChar(250)
+  ShipCrewSealingOfficerName String?          @db.NVarChar(250)
+  TotalWages                 String?          @db.NVarChar(250)
+  VesselCrewId               String           @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__04AFB25B") @db.UniqueIdentifier
+  IDPosition                 String?          @db.NVarChar(250)
+  SeamanBookNo               String?          @db.NVarChar(250)
+  ShippingArea               String?          @db.NVarChar(250)
+  VesselId                   String           @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__05A3D694") @db.UniqueIdentifier
+  CrewSealingOffice          String?          @db.NVarChar(250)
+  FirstPartyOffice           String?          @db.NVarChar(250)
+  IsExpired                  Boolean          @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_E__IsExp__0697FACD")
+  Age                        String?          @db.NVarChar(250)
+  BirthPlace                 String?          @db.NVarChar(250)
+  CrewName                   String?          @db.NVarChar(250)
+  CurrentRankPosition        String?          @db.NVarChar(250)
+  DateOfBirth                DateTime?
+  EmployeeNo                 String?          @db.NVarChar(250)
+  Flag                       String?          @db.NVarChar(250)
+  GrossTonage                String?          @db.NVarChar(250)
+  IDNumber                   String?          @db.NVarChar(250)
+  PassportNo                 String?          @db.NVarChar(250)
+  SeafarerCode               String?          @db.NVarChar(250)
+  VesselName                 String?          @db.NVarChar(250)
+  Crewing_Employee           Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationPKL_Crewing_Employee_EmployeeId")
+  Crewing_Vessel             Crewing_Vessel   @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeePreparationPKL_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeePreparationPKL_EmployeeId")
+  @@index([VesselId], map: "IX_Crewing_EmployeePreparationPKL_VesselId")
+}
+
+model Crewing_EmployeeScheduling {
+  Id                                                                                       String                                @id(map: "PK_Crewing_EmployeeScheduling") @db.UniqueIdentifier
+  EmployeeId                                                                               String                                @db.UniqueIdentifier
+  VesselId                                                                                 String                                @db.UniqueIdentifier
+  InitialRankAs                                                                            String?                               @db.NVarChar(250)
+  ScheduledOnBoardDate                                                                     DateTime?
+  ScheduledOffBoardDate                                                                    DateTime?
+  OnBoard_Accommodation                                                                    String?                               @db.NVarChar(250)
+  OnBoard_Total                                                                            String?                               @db.NVarChar(250)
+  OnBoard_Laundry                                                                          String?                               @db.NVarChar(250)
+  OnBoard_DailyAllowance                                                                   String?                               @db.NVarChar(250)
+  OnBoard_MealAllowance                                                                    String?                               @db.NVarChar(250)
+  OnBoard_LumpsumGrade                                                                     String?                               @db.NVarChar(250)
+  OnBoard_TransportAirportJakarta                                                          String?                               @db.NVarChar(250)
+  OnBoard_TransportTerminalStationPort                                                     String?                               @db.NVarChar(250)
+  OnBoard_TransportAirportOtherCities                                                      String?                               @db.NVarChar(250)
+  OnBoard_LocalTransport                                                                   String?                               @db.NVarChar(250)
+  Created                                                                                  DateTime
+  CreatedBy                                                                                String                                @db.NVarChar(Max)
+  IsDeleted                                                                                Boolean
+  Modified                                                                                 DateTime?
+  ModifiedBy                                                                               String?                               @db.NVarChar(Max)
+  EmployeeSchedulingStatusId                                                               Int                                   @default(0, map: "DF__Crewing_E__Emplo__078C1F06")
+  OriginalScheduledOffBoardDate                                                            DateTime?
+  OffBoard_Laundry                                                                         String?                               @db.NVarChar(250)
+  OffBoard_LocalTransport                                                                  String?                               @db.NVarChar(250)
+  OffBoard_LumpsumGrade                                                                    String?                               @db.NVarChar(250)
+  OffBoard_MealAllowance                                                                   String?                               @db.NVarChar(250)
+  OffBoard_Total                                                                           String?                               @db.NVarChar(250)
+  OffBoard_TransportAirportJakarta                                                         String?                               @db.NVarChar(250)
+  OffBoard_TransportAirportOtherCities                                                     String?                               @db.NVarChar(250)
+  OffBoard_TransportTerminalStationPort                                                    String?                               @db.NVarChar(250)
+  CheckInDate                                                                              DateTime?
+  CheckOutDate                                                                             DateTime?
+  OffBoardLocationPortId                                                                   String?                               @db.UniqueIdentifier
+  OnBoardLocationPortId                                                                    String?                               @db.UniqueIdentifier
+  OffBoard_Accommodation                                                                   String?                               @db.NVarChar(250)
+  OffBoard_DailyAllowance                                                                  String?                               @db.NVarChar(250)
+  JobPositionMarineId                                                                      Int?
+  JobPositionTankerId                                                                      Int?
+  VesselCrewId                                                                             String                                @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__0880433F") @db.UniqueIdentifier
+  Crewing_Employee                                                                         Crewing_Employee                      @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_Employee_EmployeeId")
+  Crewing_EmployeeSchedulingStatus                                                         Crewing_EmployeeSchedulingStatus      @relation(fields: [EmployeeSchedulingStatusId], references: [EmployeeSchedulingStatusId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_EmployeeSchedulingStatus_EmployeeSchedulingStatusId")
+  Crewing_Vessel                                                                           Crewing_Vessel                        @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_Vessel_VesselId")
+  Crewing_VesselPort_Crewing_EmployeeScheduling_OffBoardLocationPortIdToCrewing_VesselPort Crewing_VesselPort?                   @relation("Crewing_EmployeeScheduling_OffBoardLocationPortIdToCrewing_VesselPort", fields: [OffBoardLocationPortId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_VesselPort_OffBoardLocationPortId")
+  Crewing_VesselPort_Crewing_EmployeeScheduling_OnBoardLocationPortIdToCrewing_VesselPort  Crewing_VesselPort?                   @relation("Crewing_EmployeeScheduling_OnBoardLocationPortIdToCrewing_VesselPort", fields: [OnBoardLocationPortId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_VesselPort_OnBoardLocationPortId")
+  Crewing_EmployeeSchedulingAppraisal                                                      Crewing_EmployeeSchedulingAppraisal[]
+  Crewing_EmployeeSchedulingDocument                                                       Crewing_EmployeeSchedulingDocument[]
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeScheduling_EmployeeId")
+  @@index([EmployeeSchedulingStatusId], map: "IX_Crewing_EmployeeScheduling_EmployeeSchedulingStatusId")
+  @@index([OffBoardLocationPortId], map: "IX_Crewing_EmployeeScheduling_OffBoardLocationPortId")
+  @@index([OnBoardLocationPortId], map: "IX_Crewing_EmployeeScheduling_OnBoardLocationPortId")
+  @@index([VesselId], map: "IX_Crewing_EmployeeScheduling_VesselId")
+}
+
+model Crewing_EmployeeSchedulingAppraisal {
+  Id                         String                     @id(map: "PK_Crewing_EmployeeSchedulingAppraisal") @db.UniqueIdentifier
+  EmployeeSchedulingId       String                     @db.UniqueIdentifier
+  DocumentUsage              String?                    @db.NVarChar(250)
+  DocumentName               String?                    @db.NVarChar(250)
+  AttachmentId               String?                    @db.UniqueIdentifier
+  AttachmentFilename         String?                    @db.NVarChar(250)
+  Comment                    String?                    @db.NVarChar(500)
+  Created                    DateTime
+  CreatedBy                  String                     @db.NVarChar(Max)
+  IsDeleted                  Boolean
+  Modified                   DateTime?
+  ModifiedBy                 String?                    @db.NVarChar(Max)
+  Crewing_EmployeeScheduling Crewing_EmployeeScheduling @relation(fields: [EmployeeSchedulingId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeSchedulingAppraisal_Crewing_EmployeeScheduling_EmployeeSchedulingId")
+
+  @@index([EmployeeSchedulingId], map: "IX_Crewing_EmployeeSchedulingAppraisal_EmployeeSchedulingId")
+}
+
+model Crewing_EmployeeSchedulingDocument {
+  Id                         String                     @id(map: "PK_Crewing_EmployeeSchedulingDocument") @db.UniqueIdentifier
+  EmployeeSchedulingId       String                     @db.UniqueIdentifier
+  AttachmentFilename         String?                    @db.NVarChar(250)
+  DocumentUsage              String?                    @db.NVarChar(250)
+  DocumentName               String?                    @db.NVarChar(250)
+  AttachmentId               String?                    @db.UniqueIdentifier
+  Created                    DateTime
+  CreatedBy                  String                     @db.NVarChar(Max)
+  IsDeleted                  Boolean
+  Modified                   DateTime?
+  ModifiedBy                 String?                    @db.NVarChar(Max)
+  Comment                    String?                    @db.NVarChar(500)
+  Price                      String?                    @db.NVarChar(50)
+  Crewing_EmployeeScheduling Crewing_EmployeeScheduling @relation(fields: [EmployeeSchedulingId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeSchedulingDocument_Crewing_EmployeeScheduling_EmployeeSchedulingId")
+
+  @@index([EmployeeSchedulingId], map: "IX_Crewing_EmployeeSchedulingDocument_EmployeeSchedulingId")
+}
+
+model Crewing_EmployeeSchedulingStatus {
+  EmployeeSchedulingStatusId Int                          @id(map: "PK_Crewing_EmployeeSchedulingStatus") @default(autoincrement())
+  Description                String?                      @db.NVarChar(250)
+  Category                   String?                      @db.NVarChar(250)
+  Created                    DateTime
+  CreatedBy                  String                       @db.NVarChar(Max)
+  IsDeleted                  Boolean
+  Id                         String                       @db.UniqueIdentifier
+  Modified                   DateTime?
+  ModifiedBy                 String?                      @db.NVarChar(Max)
+  Crewing_EmployeeScheduling Crewing_EmployeeScheduling[]
+}
+
+model Crewing_EmployeeSeaService {
+  Id                    String           @id(map: "PK_Crewing_EmployeeSeaService") @db.UniqueIdentifier
+  EmployeeId            String           @db.UniqueIdentifier
+  SeaServiceCompanyName String?          @db.NVarChar(250)
+  SeaServicePosition    String?          @db.NVarChar(250)
+  SeaServiceShipName    String?          @db.NVarChar(250)
+  SeaServiceShipType    String?          @db.NVarChar(250)
+  SeaServiceGRT         String?          @db.NVarChar(250)
+  SeaServiceOnBoard     DateTime?
+  SeaServiceOffBoard    DateTime?
+  SeaServiceNote        String?          @db.NVarChar(250)
+  SeaServiceAttachment  String?          @db.UniqueIdentifier
+  VesselId              String?          @db.UniqueIdentifier
+  Created               DateTime
+  CreatedBy             String           @db.NVarChar(Max)
+  IsDeleted             Boolean
+  Modified              DateTime?
+  ModifiedBy            String?          @db.NVarChar(Max)
+  SeaServiceDWT         String?          @db.NVarChar(250)
+  SeaServiceHP          String?          @db.NVarChar(250)
+  Crewing_Employee      Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeSeaService_Crewing_Employee_EmployeeId")
+  Crewing_Vessel        Crewing_Vessel?  @relation(fields: [VesselId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeSeaService_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeSeaService_EmployeeId")
+  @@index([VesselId], map: "IX_Crewing_EmployeeSeaService_VesselId")
+}
+
+model Crewing_EmployeeTraining {
+  Id                  String           @id(map: "PK_Crewing_EmployeeTraining") @db.UniqueIdentifier
+  EmployeeId          String           @db.UniqueIdentifier
+  TrainingInstitution String?          @db.NVarChar(250)
+  TrainingPosition    String?          @db.NVarChar(250)
+  TrainingCategory    String?          @db.NVarChar(250)
+  TrainingInstructor  String?          @db.NVarChar(250)
+  TrainingFeedback    String?          @db.NVarChar(250)
+  TrainingEval        String?          @db.NVarChar(250)
+  TrainingStartDate   DateTime?
+  TrainingEndDate     DateTime?
+  Created             DateTime
+  CreatedBy           String           @db.NVarChar(Max)
+  IsDeleted           Boolean
+  Modified            DateTime?
+  ModifiedBy          String?          @db.NVarChar(Max)
+  Crewing_Employee    Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeTraining_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeTraining_EmployeeId")
+}
+
+model Crewing_EmployeeTravelDoc {
+  Id                String           @id(map: "PK_Crewing_EmployeeTravelDoc") @db.UniqueIdentifier
+  EmployeeId        String           @db.UniqueIdentifier
+  TravelDocName     String?          @db.NVarChar(250)
+  TravelDocNo       String?          @db.NVarChar(250)
+  DocDateIssued     DateTime?
+  DocDateExpired    DateTime?
+  TravelInformation String?          @db.NVarChar(250)
+  Created           DateTime
+  CreatedBy         String           @db.NVarChar(Max)
+  IsDeleted         Boolean
+  Modified          DateTime?
+  ModifiedBy        String?          @db.NVarChar(Max)
+  Crewing_Employee  Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeTravelDoc_Crewing_Employee_EmployeeId")
+
+  @@index([EmployeeId], map: "IX_Crewing_EmployeeTravelDoc_EmployeeId")
+}
+
+model Crewing_EmploymentType {
+  Id                       String               @id(map: "PK_Crewing_EmploymentType") @db.UniqueIdentifier
+  EmploymentTypeOrder      Int?
+  EmploymentTypeName       String               @db.NVarChar(50)
+  EmploymentTypeNameTanker String?              @db.NVarChar(50)
+  Created                  DateTime
+  CreatedBy                String               @db.NVarChar(Max)
+  IsDeleted                Boolean
+  Modified                 DateTime?
+  ModifiedBy               String?              @db.NVarChar(Max)
+  Crewing_Employee         Crewing_Employee[]
+  Crewing_JobOpening       Crewing_JobOpening[]
+}
+
+model Crewing_FileUpload {
+  Id         String    @id(map: "PK_Crewing_FileUpload") @db.UniqueIdentifier
+  FileType   String?   @db.NVarChar(50)
+  FileName   String?   @db.NVarChar(250)
+  FilePath   String?   @db.NVarChar(250)
+  Created    DateTime
+  CreatedBy  String    @db.NVarChar(Max)
+  IsDeleted  Boolean
+  Modified   DateTime?
+  ModifiedBy String?   @db.NVarChar(Max)
+  FileId     String?   @db.UniqueIdentifier
+}
+
+model Crewing_FirstParty {
+  Id             String    @id(map: "PK_Crewing_FirstParty") @db.UniqueIdentifier
+  FirstPartyName String?   @db.VarChar(100)
+  Created        DateTime
+  CreatedBy      String    @db.NVarChar(Max)
+  IsDeleted      Boolean
+  Modified       DateTime?
+  ModifiedBy     String?   @db.NVarChar(Max)
+}
+
+model Crewing_FoodCategories {
+  Id                   String                 @id(map: "PK_Crewing_FoodCategories") @db.UniqueIdentifier
+  CategoryName         String                 @db.NVarChar(Max)
+  CategoryDescription  String                 @db.NVarChar(Max)
+  Created              DateTime
+  CreatedBy            String                 @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?                @db.NVarChar(Max)
+  Crewing_FoodSupplies Crewing_FoodSupplies[]
+}
+
+model Crewing_FoodSupplies {
+  Id                     String                  @id(map: "PK_Crewing_FoodSupplies") @db.UniqueIdentifier
+  ItemName               String                  @db.NVarChar(Max)
+  Quantity               Int
+  MaxPrice               Decimal                 @db.Decimal(18, 2)
+  MinPrice               Decimal                 @db.Decimal(18, 2)
+  Unit                   String                  @db.NVarChar(Max)
+  FoodCategoryId         String?                 @db.UniqueIdentifier
+  VesselId               String?                 @db.UniqueIdentifier
+  Created                DateTime
+  CreatedBy              String                  @db.NVarChar(Max)
+  IsDeleted              Boolean
+  Modified               DateTime?
+  ModifiedBy             String?                 @db.NVarChar(Max)
+  Crewing_FoodCategories Crewing_FoodCategories? @relation(fields: [FoodCategoryId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_FoodSupplies_Crewing_FoodCategories_FoodCategoryId")
+
+  @@index([FoodCategoryId], map: "IX_Crewing_FoodSupplies_FoodCategoryId")
+}
+
+model Crewing_FoodVesselHistories {
+  Id                               String              @id(map: "PK_Crewing_FoodVesselHistories") @db.UniqueIdentifier
+  PortId                           String?             @db.UniqueIdentifier
+  VesselId                         String?             @db.UniqueIdentifier
+  RequesterName                    String?             @db.NVarChar(Max)
+  RequesterEmail                   String?             @db.NVarChar(Max)
+  QtyRequested                     Int
+  RequestDate                      DateTime?
+  DeliveryDate                     DateTime?
+  VendorName                       String?             @db.NVarChar(Max)
+  PeriodFrom                       String?             @db.NVarChar(Max)
+  PeriodTo                         String?             @db.NVarChar(Max)
+  Status                           String?             @db.NVarChar(Max)
+  RequstedAttachmentId             String?             @db.UniqueIdentifier
+  ApprovedVendorAttachmentId       String?             @db.UniqueIdentifier
+  Created                          DateTime
+  CreatedBy                        String              @db.NVarChar(Max)
+  IsDeleted                        Boolean
+  Modified                         DateTime?
+  ModifiedBy                       String?             @db.NVarChar(Max)
+  ApprovedVendorAttachmentFileName String?             @db.NVarChar(Max)
+  ReceivedDate                     DateTime?
+  RequestedAttachmentFileName      String?             @db.NVarChar(Max)
+  RejectionReason                  String?             @db.NVarChar(Max)
+  Crewing_Vessel                   Crewing_Vessel?     @relation(fields: [VesselId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_FoodVesselHistories_Crewing_Vessel_VesselId")
+  Crewing_VesselPort               Crewing_VesselPort? @relation(fields: [PortId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_FoodVesselHistories_Crewing_VesselPort_PortId")
+
+  @@index([PortId], map: "IX_Crewing_FoodVesselHistories_PortId")
+  @@index([VesselId], map: "IX_Crewing_FoodVesselHistories_VesselId")
+}
+
+model Crewing_FoodVesselHistoryDetails {
+  Id         String    @id(map: "PK_Crewing_FoodVesselHistoryDetails") @db.UniqueIdentifier
+  VesselId   String?   @db.UniqueIdentifier
+  FoodId     String?   @db.UniqueIdentifier
+  CategoryId String?   @db.UniqueIdentifier
+  Created    DateTime
+  CreatedBy  String    @db.NVarChar(Max)
+  IsDeleted  Boolean
+  Modified   DateTime?
+  ModifiedBy String?   @db.NVarChar(Max)
+}
+
+model Crewing_Institution {
+  Id              String    @id(map: "PK_Crewing_Institution") @db.UniqueIdentifier
+  InstitutionName String?   @db.VarChar(150)
+  Created         DateTime
+  CreatedBy       String    @db.NVarChar(Max)
+  IsDeleted       Boolean
+  Modified        DateTime?
+  ModifiedBy      String?   @db.NVarChar(Max)
+}
+
+model Crewing_InterviewAssessor {
+  Id                        String                      @id(map: "PK_Crewing_InterviewAssessor") @db.UniqueIdentifier
+  AssessorName              String?                     @db.VarChar(250)
+  Created                   DateTime
+  CreatedBy                 String                      @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Modified                  DateTime?
+  ModifiedBy                String?                     @db.NVarChar(Max)
+  Crewing_AssessmentHistory Crewing_AssessmentHistory[]
+}
+
+model Crewing_JobOpening {
+  Id                        String                     @id(map: "PK_Crewing_JobOpening") @db.UniqueIdentifier
+  DivisionId                Int?
+  CityId                    String?                    @db.UniqueIdentifier
+  ShipId                    Int?
+  JobPositionMarineId       Int?
+  JobPositionTankerId       Int?
+  Education                 String?                    @db.NVarChar(250)
+  WorkExperience            String?                    @db.NVarChar(250)
+  Category                  String?                    @db.NVarChar(250)
+  JobType                   String?                    @db.NVarChar(250)
+  IsOpen                    Boolean
+  Url                       String?                    @db.NVarChar(250)
+  EmploymentTypeId          String?                    @db.UniqueIdentifier
+  Created                   DateTime
+  CreatedBy                 String                     @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Modified                  DateTime?
+  ModifiedBy                String?                    @db.NVarChar(Max)
+  VesselSize                String?                    @db.NVarChar(250)
+  Crewing_City              Crewing_City?              @relation(fields: [CityId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobOpening_Crewing_City_CityId")
+  Crewing_Division          Crewing_Division?          @relation(fields: [DivisionId], references: [DivisionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobOpening_Crewing_Division_DivisionId")
+  Crewing_EmploymentType    Crewing_EmploymentType?    @relation(fields: [EmploymentTypeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobOpening_Crewing_EmploymentType_EmploymentTypeId")
+  Crewing_JobPositionMarine Crewing_JobPositionMarine? @relation(fields: [JobPositionMarineId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobOpening_Crewing_JobPositionMarine_JobPositionMarineId")
+  Crewing_JobPositionTanker Crewing_JobPositionTanker? @relation(fields: [JobPositionTankerId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobOpening_Crewing_JobPositionTanker_JobPositionTankerId")
+  Crewing_Ship              Crewing_Ship?              @relation(fields: [ShipId], references: [ShipId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobOpening_Crewing_Ship_ShipId")
+  Crewing_RegisterCrew      Crewing_RegisterCrew[]
+
+  @@index([CityId], map: "IX_Crewing_JobOpening_CityId")
+  @@index([DivisionId], map: "IX_Crewing_JobOpening_DivisionId")
+  @@index([EmploymentTypeId], map: "IX_Crewing_JobOpening_EmploymentTypeId")
+  @@index([JobPositionMarineId], map: "IX_Crewing_JobOpening_JobPositionMarineId")
+  @@index([JobPositionTankerId], map: "IX_Crewing_JobOpening_JobPositionTankerId")
+  @@index([ShipId], map: "IX_Crewing_JobOpening_ShipId")
+}
+
+model Crewing_JobPositionMarine {
+  JobPositionId                 Int                             @id(map: "PK_Crewing_JobPositionMarine") @default(autoincrement())
+  JobPositionName               String?                         @db.VarChar(250)
+  JobPositionNameEn             String?                         @db.VarChar(50)
+  Hierarchy                     Int?
+  NeedPrincipalApproval         Boolean
+  Created                       DateTime
+  CreatedBy                     String                          @db.NVarChar(Max)
+  IsDeleted                     Boolean
+  Id                            String                          @db.UniqueIdentifier
+  Modified                      DateTime?
+  ModifiedBy                    String?                         @db.NVarChar(Max)
+  LumpsumGrade                  String?                         @db.VarChar(10)
+  IsHead                        Boolean                         @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_J__IsHea__09746778")
+  BJSTTypeId                    String?                         @db.UniqueIdentifier
+  Crewing_Employee              Crewing_Employee[]
+  Crewing_EmployeeBoardSchedule Crewing_EmployeeBoardSchedule[]
+  Crewing_JobOpening            Crewing_JobOpening[]
+  Crewing_BJSTType              Crewing_BJSTType?               @relation(fields: [BJSTTypeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobPositionMarine_Crewing_BJSTType_BJSTTypeId")
+  Crewing_MatrixMarineCOC       Crewing_MatrixMarineCOC[]
+  Crewing_MatrixMarineCOP       Crewing_MatrixMarineCOP[]
+  Crewing_VesselCrew            Crewing_VesselCrew[]
+  Crewing_VesselGanttChart      Crewing_VesselGanttChart[]
+
+  @@index([BJSTTypeId], map: "IX_Crewing_JobPositionMarine_BJSTTypeId")
+}
+
+model Crewing_JobPositionSeaService {
+  Id                        String    @id(map: "PK_Crewing_JobPositionSeaService") @db.UniqueIdentifier
+  JobPositionSeaServiceName String?   @db.NVarChar(Max)
+  Created                   DateTime
+  CreatedBy                 String    @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Modified                  DateTime?
+  ModifiedBy                String?   @db.NVarChar(Max)
+}
+
+model Crewing_JobPositionTanker {
+  JobPositionId                 Int                             @id(map: "PK_Crewing_JobPositionTanker") @default(autoincrement())
+  JobPositionName               String?                         @db.VarChar(250)
+  COC                           String?                         @db.VarChar(50)
+  Hierarchy                     Int?
+  NeedPrincipalApproval         Boolean
+  Created                       DateTime
+  CreatedBy                     String                          @db.NVarChar(Max)
+  IsDeleted                     Boolean
+  Id                            String                          @db.UniqueIdentifier
+  Modified                      DateTime?
+  ModifiedBy                    String?                         @db.NVarChar(Max)
+  LumpsumGrade                  String?                         @db.VarChar(10)
+  LumpsumGradeCategory          String?                         @db.VarChar(50)
+  IsHead                        Boolean                         @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_J__IsHea__0A688BB1")
+  BJSTTypeId                    String?                         @db.UniqueIdentifier
+  Crewing_Employee              Crewing_Employee[]
+  Crewing_EmployeeBoardSchedule Crewing_EmployeeBoardSchedule[]
+  Crewing_JobOpening            Crewing_JobOpening[]
+  Crewing_BJSTType              Crewing_BJSTType?               @relation(fields: [BJSTTypeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_JobPositionTanker_Crewing_BJSTType_BJSTTypeId")
+  Crewing_MatrixTankerCOC       Crewing_MatrixTankerCOC[]
+  Crewing_MatrixTankerCOP       Crewing_MatrixTankerCOP[]
+  Crewing_VesselCrew            Crewing_VesselCrew[]
+  Crewing_VesselGanttChart      Crewing_VesselGanttChart[]
+
+  @@index([BJSTTypeId], map: "IX_Crewing_JobPositionTanker_BJSTTypeId")
+}
+
+model Crewing_Major {
+  Id         String    @id(map: "PK_Crewing_Major") @db.UniqueIdentifier
+  MajorName  String?   @db.VarChar(150)
+  Created    DateTime
+  CreatedBy  String    @db.NVarChar(Max)
+  IsDeleted  Boolean
+  Modified   DateTime?
+  ModifiedBy String?   @db.NVarChar(Max)
+}
+
+model Crewing_Manager {
+  Id          String    @id(map: "PK_Crewing_Manager") @db.UniqueIdentifier
+  ManagerName String?   @db.VarChar(100)
+  Created     DateTime
+  CreatedBy   String    @db.NVarChar(Max)
+  IsDeleted   Boolean
+  Modified    DateTime?
+  ModifiedBy  String?   @db.NVarChar(Max)
+}
+
+model Crewing_MandatoryType {
+  MandatoryType           String                    @id(map: "PK_Crewing_MandatoryType") @db.VarChar(10)
+  MandatoryDescription    String?                   @db.VarChar(250)
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Id                      String                    @db.UniqueIdentifier
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_MatrixTankerCOP Crewing_MatrixTankerCOP[]
+}
+
+model Crewing_MarineSuperintendent {
+  Id                       String    @id(map: "PK_Crewing_MarineSuperintendent") @db.UniqueIdentifier
+  MarineSuperintendentName String?   @db.VarChar(100)
+  Created                  DateTime
+  CreatedBy                String    @db.NVarChar(Max)
+  IsDeleted                Boolean
+  Modified                 DateTime?
+  ModifiedBy               String?   @db.NVarChar(Max)
+}
+
+model Crewing_MaritalStatus {
+  Id                   String                 @id(map: "PK_Crewing_MaritalStatus") @db.UniqueIdentifier
+  MaritalStatusName    String?                @db.VarChar(50)
+  MaritalStatusNameEn  String?                @db.VarChar(50)
+  Created              DateTime
+  CreatedBy            String                 @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?                @db.NVarChar(Max)
+  Crewing_Employee     Crewing_Employee[]
+  Crewing_RegisterCrew Crewing_RegisterCrew[]
+}
+
+model Crewing_MatrixMarineCOC {
+  MatrixMarineCOCId         Int                        @id(map: "PK_Crewing_MatrixMarineCOC") @default(autoincrement())
+  ShipId                    Int?
+  JobPositionId             Int?
+  COCId                     Int?
+  IsMandatory               Boolean?
+  Created                   DateTime
+  CreatedBy                 String                     @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Id                        String                     @db.UniqueIdentifier
+  Modified                  DateTime?
+  ModifiedBy                String?                    @db.NVarChar(Max)
+  Crewing_COCMarine         Crewing_COCMarine?         @relation(fields: [COCId], references: [COCId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixMarineCOC_Crewing_COCMarine_COCId")
+  Crewing_JobPositionMarine Crewing_JobPositionMarine? @relation(fields: [JobPositionId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixMarineCOC_Crewing_JobPositionMarine_JobPositionId")
+  Crewing_Ship              Crewing_Ship?              @relation(fields: [ShipId], references: [ShipId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixMarineCOC_Crewing_Ship_ShipId")
+
+  @@index([COCId], map: "IX_Crewing_MatrixMarineCOC_COCId")
+  @@index([JobPositionId], map: "IX_Crewing_MatrixMarineCOC_JobPositionId")
+  @@index([ShipId], map: "IX_Crewing_MatrixMarineCOC_ShipId")
+}
+
+model Crewing_MatrixMarineCOP {
+  MatrixMarineCOPId         Int                        @id(map: "PK_Crewing_MatrixMarineCOP") @default(autoincrement())
+  ShipId                    Int?
+  JobPositionId             Int?
+  COPId                     Int?
+  IsMandatory               Boolean?
+  ExpiryYear                Int?
+  Created                   DateTime
+  CreatedBy                 String                     @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Id                        String                     @db.UniqueIdentifier
+  Modified                  DateTime?
+  ModifiedBy                String?                    @db.NVarChar(Max)
+  Crewing_COPMarine         Crewing_COPMarine?         @relation(fields: [COPId], references: [COPId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixMarineCOP_Crewing_COPMarine_COPId")
+  Crewing_JobPositionMarine Crewing_JobPositionMarine? @relation(fields: [JobPositionId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixMarineCOP_Crewing_JobPositionMarine_JobPositionId")
+  Crewing_Ship              Crewing_Ship?              @relation(fields: [ShipId], references: [ShipId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixMarineCOP_Crewing_Ship_ShipId")
+
+  @@index([COPId], map: "IX_Crewing_MatrixMarineCOP_COPId")
+  @@index([JobPositionId], map: "IX_Crewing_MatrixMarineCOP_JobPositionId")
+  @@index([ShipId], map: "IX_Crewing_MatrixMarineCOP_ShipId")
+}
+
+model Crewing_MatrixSPPD {
+  LumpsumGrade                 String    @id(map: "PK_Crewing_MatrixSPPD") @db.NVarChar(10)
+  MealAllowance                String?   @db.NVarChar(50)
+  DailyAllowance               String?   @db.NVarChar(50)
+  Accommodation                String?   @db.NVarChar(50)
+  LocalTransport               String?   @db.NVarChar(50)
+  Laundry                      String?   @db.NVarChar(50)
+  TransportAirportJakarta      String?   @db.NVarChar(50)
+  TransportTerminalStationPort String?   @db.NVarChar(50)
+  TransportAirportOtherCities  String?   @db.NVarChar(50)
+  Created                      DateTime
+  CreatedBy                    String    @db.NVarChar(Max)
+  IsDeleted                    Boolean
+  Id                           String    @db.UniqueIdentifier
+  Modified                     DateTime?
+  ModifiedBy                   String?   @db.NVarChar(Max)
+}
+
+model Crewing_MatrixTankerCOC {
+  MatrixTankerCOCId         Int                        @id(map: "PK_Crewing_MatrixTankerCOC") @default(autoincrement())
+  JobPositionId             Int?
+  COCId                     Int?
+  Created                   DateTime
+  CreatedBy                 String                     @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Id                        String                     @db.UniqueIdentifier
+  Modified                  DateTime?
+  ModifiedBy                String?                    @db.NVarChar(Max)
+  Crewing_COCTanker         Crewing_COCTanker?         @relation(fields: [COCId], references: [COCId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixTankerCOC_Crewing_COCTanker_COCId")
+  Crewing_JobPositionTanker Crewing_JobPositionTanker? @relation(fields: [JobPositionId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixTankerCOC_Crewing_JobPositionTanker_JobPositionId")
+
+  @@index([COCId], map: "IX_Crewing_MatrixTankerCOC_COCId")
+  @@index([JobPositionId], map: "IX_Crewing_MatrixTankerCOC_JobPositionId")
+}
+
+model Crewing_MatrixTankerCOP {
+  MatrixTankerCOPId         Int                        @id(map: "PK_Crewing_MatrixTankerCOP") @default(autoincrement())
+  ShipId                    Int?
+  JobPositionId             Int?
+  COPId                     Int?
+  MandatoryType             String?                    @db.VarChar(10)
+  Created                   DateTime
+  CreatedBy                 String                     @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Id                        String                     @db.UniqueIdentifier
+  Modified                  DateTime?
+  ModifiedBy                String?                    @db.NVarChar(Max)
+  Crewing_COPTanker         Crewing_COPTanker?         @relation(fields: [COPId], references: [COPId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixTankerCOP_Crewing_COPTanker_COPId")
+  Crewing_JobPositionTanker Crewing_JobPositionTanker? @relation(fields: [JobPositionId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixTankerCOP_Crewing_JobPositionTanker_JobPositionId")
+  Crewing_MandatoryType     Crewing_MandatoryType?     @relation(fields: [MandatoryType], references: [MandatoryType], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixTankerCOP_Crewing_MandatoryType_MandatoryType")
+  Crewing_Ship              Crewing_Ship?              @relation(fields: [ShipId], references: [ShipId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_MatrixTankerCOP_Crewing_Ship_ShipId")
+
+  @@index([COPId], map: "IX_Crewing_MatrixTankerCOP_COPId")
+  @@index([JobPositionId], map: "IX_Crewing_MatrixTankerCOP_JobPositionId")
+  @@index([MandatoryType], map: "IX_Crewing_MatrixTankerCOP_MandatoryType")
+  @@index([ShipId], map: "IX_Crewing_MatrixTankerCOP_ShipId")
+}
+
+model Crewing_MCUClinics {
+  Id            String    @id(map: "PK_Crewing_MCUClinics") @db.UniqueIdentifier
+  ClinicName    String?   @db.VarChar(500)
+  ClinicAddress String?   @db.VarChar(500)
+  ClinicPhoneNo String?   @db.VarChar(500)
+  Created       DateTime
+  CreatedBy     String    @db.NVarChar(Max)
+  IsDeleted     Boolean
+  Modified      DateTime?
+  ModifiedBy    String?   @db.NVarChar(Max)
+}
+
+model Crewing_MCUHealthStatusDegree {
+  Id                             String                           @id(map: "PK_Crewing_MCUHealthStatusDegree") @db.UniqueIdentifier
+  HealthStatusDegreeCode         String?                          @db.NVarChar(250)
+  HealthStatusDegree             String?                          @db.NVarChar(250)
+  HealthStatusDegreeEn           String?                          @db.NVarChar(250)
+  Created                        DateTime
+  CreatedBy                      String                           @db.NVarChar(Max)
+  IsDeleted                      Boolean
+  Modified                       DateTime?
+  ModifiedBy                     String?                          @db.NVarChar(Max)
+  Crewing_AssessmentHistory      Crewing_AssessmentHistory[]
+  Crewing_EmployeePreparationMCU Crewing_EmployeePreparationMCU[]
+}
+
+model Crewing_MCUPackages {
+  Id                             String                           @id(map: "PK_Crewing_MCUPackages") @db.UniqueIdentifier
+  MCUDescription                 String?                          @db.VarChar(500)
+  MCUAttachment1                 String?                          @db.VarChar(Max)
+  MCUAttachment2                 String?                          @db.VarChar(Max)
+  Created                        DateTime
+  CreatedBy                      String                           @db.NVarChar(Max)
+  IsDeleted                      Boolean
+  Modified                       DateTime?
+  ModifiedBy                     String?                          @db.NVarChar(Max)
+  UsedForPKLValidation           Boolean?
+  Crewing_AssessmentHistory      Crewing_AssessmentHistory[]
+  Crewing_EmployeePreparationMCU Crewing_EmployeePreparationMCU[]
+}
+
+model Crewing_NavigationStatus {
+  Id                      String                    @id(map: "PK_Crewing_NavigationStatus") @db.UniqueIdentifier
+  NavigationStatusDesc    String?                   @db.NVarChar(250)
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_VesselVoyageLog Crewing_VesselVoyageLog[]
+}
+
+model Crewing_Principals {
+  Id                         String                       @id(map: "PK_Crewing_Principals") @db.UniqueIdentifier
+  PrincipalName              String                       @db.NVarChar(Max)
+  PrincipalEmail             String                       @db.NVarChar(Max)
+  Created                    DateTime
+  CreatedBy                  String                       @db.NVarChar(Max)
+  IsDeleted                  Boolean
+  Modified                   DateTime?
+  ModifiedBy                 String?                      @db.NVarChar(Max)
+  DivisionId                 Int                          @default(0, map: "DF__Crewing_P__Divis__0B5CAFEA")
+  UserId                     String?                      @db.UniqueIdentifier
+  Crewing_ContractManagement Crewing_ContractManagement[]
+  Crewing_Users              Crewing_Users?               @relation(fields: [UserId], references: [UserId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Principals_Crewing_Users_UserId")
+  Crewing_Vessel             Crewing_Vessel[]
+
+  @@index([UserId], map: "IX_Crewing_Principals_UserId")
+}
+
+model Crewing_PublicToken {
+  Id              String    @id(map: "PK_Crewing_PublicToken") @db.UniqueIdentifier
+  Token           String?
+  Created         DateTime
+  CreatedBy       String    @db.NVarChar(Max)
+  IsDeleted       Boolean
+  Modified        DateTime?
+  ModifiedBy      String?   @db.NVarChar(Max)
+  FileUploadCount Int?
+  RequestCount    Int?
+  SubmitCount     Int?
+}
+
+model Crewing_QualificationOfTraining {
+  Id                              String                            @id(map: "PK_Crewing_QualificationOfTraining") @db.UniqueIdentifier
+  QualificationOfTrainingName     String?                           @db.VarChar(50)
+  Created                         DateTime
+  CreatedBy                       String                            @db.NVarChar(Max)
+  IsDeleted                       Boolean
+  Modified                        DateTime?
+  ModifiedBy                      String?                           @db.NVarChar(Max)
+  Crewing_EmployeePreparationBJST Crewing_EmployeePreparationBJST[]
+}
+
+model Crewing_RegisterCOCDoc {
+  Id                   String               @id(map: "PK_Crewing_RegisterCOCDoc") @db.UniqueIdentifier
+  RegisterCrewId       String               @db.UniqueIdentifier
+  RegCOCName           String?              @db.NVarChar(250)
+  RegCOCNumber         String?              @db.NVarChar(250)
+  COCId                Int?
+  RegCOCPublishedDate  DateTime?
+  RegCOCExpiryDate     DateTime?
+  RegCOCDescription    String?              @db.NVarChar(500)
+  RegCOCAttachment     String?              @db.UniqueIdentifier
+  Created              DateTime
+  CreatedBy            String               @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterCOCDoc_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterCOCDoc_RegisterCrewId")
+}
+
+model Crewing_RegisterCOPDoc {
+  Id                   String               @id(map: "PK_Crewing_RegisterCOPDoc") @db.UniqueIdentifier
+  RegisterCrewId       String               @db.UniqueIdentifier
+  RegCOPName           String?              @db.NVarChar(250)
+  RegCOPNumber         String?              @db.NVarChar(250)
+  COPId                Int?
+  RegCOPPublishedDate  DateTime?
+  RegCOPExpiryDate     DateTime?
+  RegCOPDescription    String?              @db.NVarChar(500)
+  RegCOPAttachment     String?              @db.UniqueIdentifier
+  Created              DateTime
+  CreatedBy            String               @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterCOPDoc_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterCOPDoc_RegisterCrewId")
+}
+
+model Crewing_RegisterCrew {
+  Id                                                         String                               @id(map: "PK_Crewing_RegisterCrew") @db.UniqueIdentifier
+  RegCrewNo                                                  BigInt
+  RegRegisNo                                                 String?                              @db.NVarChar(50)
+  RegFullName                                                String                               @db.NVarChar(250)
+  RegAddress                                                 String?                              @db.NVarChar(500)
+  RegEmail                                                   String                               @db.NVarChar(250)
+  RegGender                                                  String?                              @db.NVarChar(250)
+  RegPlaceOfBirth                                            String?                              @db.NVarChar(250)
+  RegDateOfBirth                                             DateTime?
+  RegReligionId                                              String?                              @db.UniqueIdentifier
+  RegMaritalStatusId                                         String?                              @db.UniqueIdentifier
+  RegNationality                                             String?                              @db.NVarChar(250)
+  RegPhotoId                                                 String?                              @db.UniqueIdentifier
+  RegPassportPhotoId                                         String?                              @db.UniqueIdentifier
+  RegKtpPhotoId                                              String?                              @db.UniqueIdentifier
+  RegIdCardNo                                                String?                              @db.NVarChar(250)
+  RegIdPassport                                              String?                              @db.NVarChar(250)
+  RegFamilyCardNo                                            String?                              @db.NVarChar(250)
+  RegNPWP                                                    String?                              @db.NVarChar(250)
+  RegBPJSKesNo                                               String?                              @db.NVarChar(250)
+  RegBPJSTKNo                                                String?                              @db.NVarChar(250)
+  RegPhoneNo                                                 String?                              @db.NVarChar(250)
+  RegRelativesName                                           String?                              @db.NVarChar(250)
+  RegRelativesEmail                                          String?                              @db.NVarChar(250)
+  RegRelativesPhone                                          String?                              @db.NVarChar(250)
+  RegRelativesAddress                                        String?                              @db.NVarChar(250)
+  RegBankAccount1                                            String?                              @db.NVarChar(250)
+  RegBankId1                                                 String?                              @db.UniqueIdentifier
+  RegBankAccountName1                                        String?                              @db.NVarChar(250)
+  RegBankAccount2                                            String?                              @db.NVarChar(250)
+  RegBankId2                                                 String?                              @db.UniqueIdentifier
+  RegBankAccountName2                                        String?                              @db.NVarChar(250)
+  RegDivisionId                                              Int
+  CurrentStatusId                                            Int
+  JobOpeningId                                               String                               @db.UniqueIdentifier
+  StatusUrl                                                  String?                              @db.NVarChar(250)
+  RegApplyDate                                               DateTime?
+  RegSeaFarerId                                              String?                              @db.NVarChar(250)
+  EmployeeIdNumber                                           String?                              @db.NVarChar(250)
+  WilingToAcceptLowerRank                                    Boolean?
+  AvailableForm                                              DateTime?
+  AvailableUntil                                             DateTime?
+  Weight                                                     String?                              @db.NVarChar(50)
+  Height                                                     String?                              @db.NVarChar(50)
+  BMI                                                        String?                              @db.NVarChar(50)
+  SafetyShoesSize                                            String?                              @db.NVarChar(250)
+  TrousersSize                                               String?                              @db.NVarChar(250)
+  CoverallSize                                               String?                              @db.NVarChar(250)
+  ShirtSize                                                  String?                              @db.NVarChar(250)
+  Created                                                    DateTime
+  CreatedBy                                                  String                               @db.NVarChar(Max)
+  IsDeleted                                                  Boolean
+  Modified                                                   DateTime?
+  ModifiedBy                                                 String?                              @db.NVarChar(Max)
+  RegSeamanBookNo                                            String?                              @db.NVarChar(250)
+  TemporaryPassword                                          String?                              @db.NVarChar(250)
+  NIP                                                        String?                              @db.VarChar(20)
+  FirstName                                                  String?                              @db.VarChar(50)
+  LastName                                                   String?                              @db.VarChar(30)
+  NickName                                                   String?                              @db.VarChar(20)
+  Email                                                      String?                              @db.VarChar(50)
+  Password                                                   String?                              @db.VarChar(50)
+  PositionId                                                 Int?
+  StatusRegister                                             String?                              @db.UniqueIdentifier
+  Address                                                    String?                              @db.VarChar(200)
+  BirthLoc                                                   String?                              @db.VarChar(100)
+  BirthDate                                                  DateTime?                            @db.DateTime
+  BirthPlaceId                                               Int?
+  CellPhone                                                  String?                              @db.VarChar(20)
+  Gender                                                     String?                              @db.NChar(1)
+  HomePhone                                                  String?                              @db.VarChar(20)
+  IdentityCardNo                                             String?                              @db.VarChar(30)
+  ReligionId                                                 Int?
+  AddressKtp                                                 String?                              @db.VarChar(200)
+  NPWP                                                       String?                              @db.VarChar(200)
+  KKNumber                                                   String?                              @db.VarChar(25)
+  BPJSKetNumber                                              String?                              @db.VarChar(25)
+  BPJSKesNumber                                              String?                              @db.VarChar(25)
+  BankId                                                     Int?
+  BankAccountNo                                              String?                              @db.VarChar(25)
+  BankAccountName                                            String?                              @db.VarChar(50)
+  BankId2                                                    Int?
+  BankAccountNo2                                             String?                              @db.VarChar(25)
+  BankAccountName2                                           String?                              @db.VarChar(50)
+  Foto                                                       String?                              @db.VarChar(200)
+  MaritalStatusId                                            Int?
+  ShipId                                                     Int?
+  OnBoard                                                    DateTime?                            @db.DateTime
+  OffBoard                                                   DateTime?                            @db.DateTime
+  ShipRejection                                              Int?
+  SeaManBook                                                 String?                              @db.VarChar(50)
+  PasporBook                                                 String?                              @db.VarChar(50)
+  McuIssued                                                  String?                              @db.VarChar(50)
+  RegShipStatusId                                            Int?
+  CompanyId                                                  String?                              @db.UniqueIdentifier
+  CreatedAt                                                  DateTime?                            @db.DateTime
+  UpdatedAt                                                  DateTime?                            @db.DateTime
+  Crewing_AssessmentHistory                                  Crewing_AssessmentHistory[]
+  Crewing_RegisterCOCDoc                                     Crewing_RegisterCOCDoc[]
+  Crewing_RegisterCOPDoc                                     Crewing_RegisterCOPDoc[]
+  Crewing_Bank_Crewing_RegisterCrew_RegBankId1ToCrewing_Bank Crewing_Bank?                        @relation("Crewing_RegisterCrew_RegBankId1ToCrewing_Bank", fields: [RegBankId1], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_Bank_RegBankId1")
+  Crewing_Bank_Crewing_RegisterCrew_RegBankId2ToCrewing_Bank Crewing_Bank?                        @relation("Crewing_RegisterCrew_RegBankId2ToCrewing_Bank", fields: [RegBankId2], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_Bank_RegBankId2")
+  Crewing_Division                                           Crewing_Division                     @relation(fields: [RegDivisionId], references: [DivisionId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_Division_RegDivisionId")
+  Crewing_JobOpening                                         Crewing_JobOpening                   @relation(fields: [JobOpeningId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_JobOpening_JobOpeningId")
+  Crewing_MaritalStatus                                      Crewing_MaritalStatus?               @relation(fields: [RegMaritalStatusId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_MaritalStatus_RegMaritalStatusId")
+  Crewing_RegisterStatusList                                 Crewing_RegisterStatusList           @relation(fields: [CurrentStatusId], references: [RegisterStatusId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_RegisterStatusList_CurrentStatusId")
+  Crewing_Religion                                           Crewing_Religion?                    @relation(fields: [RegReligionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_RegisterCrew_Crewing_Religion_RegReligionId")
+  Crewing_RegisterEducation                                  Crewing_RegisterEducation[]
+  Crewing_RegisterFamily                                     Crewing_RegisterFamily[]
+  Crewing_RegisterMedicalCertificate                         Crewing_RegisterMedicalCertificate[]
+  Crewing_RegisterSeaService                                 Crewing_RegisterSeaService[]
+  Crewing_RegisterTraining                                   Crewing_RegisterTraining[]
+  Crewing_RegisterTravelDoc                                  Crewing_RegisterTravelDoc[]
+
+  @@index([CurrentStatusId], map: "IX_Crewing_RegisterCrew_CurrentStatusId")
+  @@index([JobOpeningId], map: "IX_Crewing_RegisterCrew_JobOpeningId")
+  @@index([RegBankId1], map: "IX_Crewing_RegisterCrew_RegBankId1")
+  @@index([RegBankId2], map: "IX_Crewing_RegisterCrew_RegBankId2")
+  @@index([RegDivisionId], map: "IX_Crewing_RegisterCrew_RegDivisionId")
+  @@index([RegMaritalStatusId], map: "IX_Crewing_RegisterCrew_RegMaritalStatusId")
+  @@index([RegReligionId], map: "IX_Crewing_RegisterCrew_RegReligionId")
+}
+
+model Crewing_RegisterEducation {
+  Id                   String               @id(map: "PK_Crewing_RegisterEducation") @db.UniqueIdentifier
+  RegisterCrewId       String               @db.UniqueIdentifier
+  RegEduSchool         String?              @db.NVarChar(250)
+  RegEduDegree         String?              @db.NVarChar(250)
+  RegEduMajor          String?              @db.NVarChar(250)
+  RegEduGPA            Decimal?             @db.Decimal(18, 3)
+  RegEduYearAdmission  Int?
+  RegEduYearGraduate   Int?
+  RegEduCity           String?              @db.NVarChar(250)
+  Created              DateTime
+  CreatedBy            String               @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterEducation_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterEducation_RegisterCrewId")
+}
+
+model Crewing_RegisterFamily {
+  Id                   String               @id(map: "PK_Crewing_RegisterFamily") @db.UniqueIdentifier
+  RegisterCrewId       String               @db.UniqueIdentifier
+  Relationship         String?              @db.NVarChar(250)
+  Fullname             String?              @db.NVarChar(250)
+  Gender               String?              @db.NVarChar(250)
+  DateOfBirth          DateTime?
+  MobileNo             String?              @db.NVarChar(250)
+  Email                String?              @db.NVarChar(250)
+  KtpNumber            String?              @db.NVarChar(250)
+  FamilyRegisterNumber String?              @db.NVarChar(250)
+  Address              String?              @db.NVarChar(250)
+  Created              DateTime
+  CreatedBy            String               @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterFamily_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterFamily_RegisterCrewId")
+}
+
+model Crewing_RegisterMedicalCertificate {
+  Id                     String               @id(map: "PK_Crewing_RegisterMedicalCertificate") @db.UniqueIdentifier
+  RegisterCrewId         String               @db.UniqueIdentifier
+  MedicalCertificateName String?              @db.NVarChar(250)
+  Number                 String?              @db.NVarChar(250)
+  PlaceOfIssue           String?              @db.NVarChar(250)
+  DateOfIssue            DateTime?
+  ExpirationDate         DateTime?
+  AttachmentFileId       String?              @db.UniqueIdentifier
+  Created                DateTime
+  CreatedBy              String               @db.NVarChar(Max)
+  IsDeleted              Boolean
+  Modified               DateTime?
+  ModifiedBy             String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew   Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterMedicalCertificate_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterMedicalCertificate_RegisterCrewId")
+}
+
+model Crewing_RegisterSeaService {
+  Id                       String               @id(map: "PK_Crewing_RegisterSeaService") @db.UniqueIdentifier
+  RegisterCrewId           String               @db.UniqueIdentifier
+  RegSeaServiceCompanyName String?              @db.NVarChar(250)
+  RegSeaServicePosition    String?              @db.NVarChar(250)
+  RegSeaServiceShipName    String?              @db.NVarChar(250)
+  RegSeaServiceShipType    String?              @db.NVarChar(250)
+  RegSeaServiceGRT         String?              @db.NVarChar(250)
+  RegSeaServiceOnBoard     DateTime?
+  RegSeaServiceOffBoard    DateTime?
+  RegSeaServiceNote        String?              @db.NVarChar(250)
+  RegSeaServiceAttachment  String?              @db.UniqueIdentifier
+  Created                  DateTime
+  CreatedBy                String               @db.NVarChar(Max)
+  IsDeleted                Boolean
+  Modified                 DateTime?
+  ModifiedBy               String?              @db.NVarChar(Max)
+  RegSeaServiceDWT         String?              @db.NVarChar(Max)
+  RegSeaServiceHP          String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew     Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterSeaService_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterSeaService_RegisterCrewId")
+}
+
+model Crewing_RegisterStatusList {
+  RegisterStatusId      Int                    @id(map: "PK_Crewing_RegisterStatusList") @default(autoincrement())
+  RegisterStatusName    String?                @db.VarChar(50)
+  RegisterStatusNameEn  String?                @db.VarChar(50)
+  RegisterStatusGroup   String?                @db.VarChar(50)
+  RegisterStatusGroupEn String?                @db.VarChar(50)
+  AssessmentType        String?                @db.NVarChar(50)
+  Created               DateTime
+  CreatedBy             String                 @db.NVarChar(Max)
+  IsDeleted             Boolean
+  Id                    String                 @db.UniqueIdentifier
+  Modified              DateTime?
+  ModifiedBy            String?                @db.NVarChar(Max)
+  Crewing_RegisterCrew  Crewing_RegisterCrew[]
+}
+
+model Crewing_RegisterTraining {
+  Id                     String               @id(map: "PK_Crewing_RegisterTraining") @db.UniqueIdentifier
+  RegisterCrewId         String               @db.UniqueIdentifier
+  RegTrainingInstitution String?              @db.NVarChar(250)
+  RegTrainingPosition    String?              @db.NVarChar(250)
+  RegTrainingCategory    String?              @db.NVarChar(250)
+  RegTrainingInstructor  String?              @db.NVarChar(250)
+  RegTrainingFeedback    String?              @db.NVarChar(250)
+  RegTrainingEval        String?              @db.NVarChar(250)
+  RegTrainingStartDate   DateTime?
+  RegTrainingEndDate     DateTime?
+  Created                DateTime
+  CreatedBy              String               @db.NVarChar(Max)
+  IsDeleted              Boolean
+  Modified               DateTime?
+  ModifiedBy             String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew   Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterTraining_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterTraining_RegisterCrewId")
+}
+
+model Crewing_RegisterTravelDoc {
+  Id                   String               @id(map: "PK_Crewing_RegisterTravelDoc") @db.UniqueIdentifier
+  RegisterCrewId       String               @db.UniqueIdentifier
+  RegTravelDocName     String?              @db.NVarChar(250)
+  RegTravelDocNo       String?              @db.NVarChar(250)
+  RegDocDateIssued     DateTime?
+  RegDocDateExpired    DateTime?
+  RegTravelInformation String?              @db.NVarChar(250)
+  Created              DateTime
+  CreatedBy            String               @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?              @db.NVarChar(Max)
+  Crewing_RegisterCrew Crewing_RegisterCrew @relation(fields: [RegisterCrewId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_RegisterTravelDoc_Crewing_RegisterCrew_RegisterCrewId")
+
+  @@index([RegisterCrewId], map: "IX_Crewing_RegisterTravelDoc_RegisterCrewId")
+}
+
+model Crewing_Religion {
+  Id                   String                 @id(map: "PK_Crewing_Religion") @db.UniqueIdentifier
+  ReligionName         String?                @db.VarChar(50)
+  Created              DateTime
+  CreatedBy            String                 @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?                @db.NVarChar(Max)
+  Crewing_Employee     Crewing_Employee[]
+  Crewing_RegisterCrew Crewing_RegisterCrew[]
+}
+
+model Crewing_School {
+  Id         String    @id(map: "PK_Crewing_School") @db.UniqueIdentifier
+  SchoolName String?   @db.VarChar(50)
+  Created    DateTime
+  CreatedBy  String    @db.NVarChar(Max)
+  IsDeleted  Boolean
+  Modified   DateTime?
+  ModifiedBy String?   @db.NVarChar(Max)
+}
+
+model Crewing_SealingOfficer {
+  Id                 String    @id(map: "PK_Crewing_SealingOfficer") @db.UniqueIdentifier
+  SealingOfficerName String?   @db.VarChar(250)
+  Created            DateTime
+  CreatedBy          String    @db.NVarChar(Max)
+  IsDeleted          Boolean
+  Modified           DateTime?
+  ModifiedBy         String?   @db.NVarChar(Max)
+}
+
+model Crewing_Ship {
+  ShipId                  Int                       @id(map: "PK_Crewing_Ship") @default(autoincrement())
+  DivisionId              Int?
+  ShipName                String?                   @db.VarChar(50)
+  Created                 DateTime
+  CreatedBy               String                    @db.NVarChar(Max)
+  IsDeleted               Boolean
+  Id                      String                    @db.UniqueIdentifier
+  Modified                DateTime?
+  ModifiedBy              String?                   @db.NVarChar(Max)
+  Crewing_Employee        Crewing_Employee[]
+  Crewing_JobOpening      Crewing_JobOpening[]
+  Crewing_MatrixMarineCOC Crewing_MatrixMarineCOC[]
+  Crewing_MatrixMarineCOP Crewing_MatrixMarineCOP[]
+  Crewing_MatrixTankerCOP Crewing_MatrixTankerCOP[]
+  Crewing_Division        Crewing_Division?         @relation(fields: [DivisionId], references: [DivisionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Ship_Crewing_Division_DivisionId")
+  Crewing_Vessel          Crewing_Vessel[]
+
+  @@index([DivisionId], map: "IX_Crewing_Ship_DivisionId")
+}
+
+model Crewing_ShippingArea {
+  Id               String    @id(map: "PK_Crewing_ShippingArea") @db.UniqueIdentifier
+  ShippingAreaName String?   @db.VarChar(100)
+  Created          DateTime
+  CreatedBy        String    @db.NVarChar(Max)
+  IsDeleted        Boolean
+  Modified         DateTime?
+  ModifiedBy       String?   @db.NVarChar(Max)
+}
+
+model Crewing_TechnicalSuperintendent {
+  Id                          String    @id(map: "PK_Crewing_TechnicalSuperintendent") @db.UniqueIdentifier
+  TechnicalSuperintendentName String?   @db.VarChar(100)
+  Created                     DateTime
+  CreatedBy                   String    @db.NVarChar(Max)
+  IsDeleted                   Boolean
+  Modified                    DateTime?
+  ModifiedBy                  String?   @db.NVarChar(Max)
+}
+
+model Crewing_Training {
+  Id           String    @id(map: "PK_Crewing_Training") @db.UniqueIdentifier
+  TrainingName String?   @db.VarChar(150)
+  Created      DateTime
+  CreatedBy    String    @db.NVarChar(Max)
+  IsDeleted    Boolean
+  Modified     DateTime?
+  ModifiedBy   String?   @db.NVarChar(Max)
+}
+
+model Crewing_UJBMSpecialOccassion {
+  Id                   String    @id(map: "PK_Crewing_UJBMSpecialOccassion") @db.UniqueIdentifier
+  UJBMMonth            String?   @db.NVarChar(100)
+  UJBMYear             Int?
+  SpecialOccassionDays Int?
+  Created              DateTime
+  CreatedBy            String    @db.NVarChar(Max)
+  IsDeleted            Boolean
+  Modified             DateTime?
+  ModifiedBy           String?   @db.NVarChar(Max)
+}
+
+model Crewing_UserAccess {
+  Id                       String                     @db.UniqueIdentifier
+  AccessName               String                     @id(map: "PK_Crewing_UserAccess") @db.NVarChar(50)
+  Created                  DateTime
+  CreatedBy                String                     @db.NVarChar(Max)
+  IsDeleted                Boolean
+  Modified                 DateTime?
+  ModifiedBy               String?                    @db.NVarChar(Max)
+  Crewing_UserAccessMatrix Crewing_UserAccessMatrix[]
+}
+
+model Crewing_UserAccessMatrix {
+  Role                String               @db.NVarChar(450)
+  SubRole             String?              @db.NVarChar(450)
+  Created             DateTime
+  CreatedBy           String               @db.NVarChar(Max)
+  IsDeleted           Boolean
+  Id                  String               @id(map: "PK_Crewing_UserAccessMatrix") @db.UniqueIdentifier
+  Modified            DateTime?
+  ModifiedBy          String?              @db.NVarChar(Max)
+  UserAccessName      String               @default("N'", map: "DF__Crewing_U__UserA__0C50D423") @db.NVarChar(50)
+  Crewing_UserAccess  Crewing_UserAccess   @relation(fields: [UserAccessName], references: [AccessName], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_UserAccessMatrix_Crewing_UserAccess_UserAccessName")
+  Crewing_UserRole    Crewing_UserRole     @relation(fields: [Role], references: [Name], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_UserAccessMatrix_Crewing_UserRole_Role")
+  Crewing_UserSubRole Crewing_UserSubRole? @relation(fields: [SubRole], references: [Name], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_UserAccessMatrix_Crewing_UserSubRole_SubRole")
+
+  @@index([Role], map: "IX_Crewing_UserAccessMatrix_Role")
+  @@index([SubRole], map: "IX_Crewing_UserAccessMatrix_SubRole")
+  @@index([UserAccessName], map: "IX_Crewing_UserAccessMatrix_UserAccessName")
+}
+
+model Crewing_UserRole {
+  Name                     String                     @id(map: "PK_Crewing_UserRole") @db.NVarChar(450)
+  HasSubRole               Boolean?
+  Created                  DateTime
+  CreatedBy                String                     @db.NVarChar(Max)
+  IsDeleted                Boolean
+  Id                       String                     @db.UniqueIdentifier
+  Modified                 DateTime?
+  ModifiedBy               String?                    @db.NVarChar(Max)
+  Crewing_UserAccessMatrix Crewing_UserAccessMatrix[]
+  Crewing_Users            Crewing_Users[]
+}
+
+model Crewing_Users {
+  Id                        String                      @db.UniqueIdentifier
+  UserId                    String                      @id(map: "PK_Crewing_Users") @db.UniqueIdentifier
+  LastName                  String                      @db.NVarChar(500)
+  FirstName                 String                      @db.NVarChar(500)
+  Role                      String                      @db.NVarChar(450)
+  Created                   DateTime
+  CreatedBy                 String                      @db.NVarChar(Max)
+  IsDeleted                 Boolean
+  Modified                  DateTime?
+  ModifiedBy                String?                     @db.NVarChar(Max)
+  DivisionId                Int                         @default(0, map: "DF__Crewing_U__Divis__0D44F85C")
+  Email                     String                      @db.NVarChar(500)
+  EmployeeId                String?                     @db.UniqueIdentifier
+  SubRole                   String?                     @db.NVarChar(450)
+  Crewing_AssessmentHistory Crewing_AssessmentHistory[]
+  Crewing_Principals        Crewing_Principals[]
+  Crewing_Division          Crewing_Division            @relation(fields: [DivisionId], references: [DivisionId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_Users_Crewing_Division_DivisionId")
+  Crewing_UserRole          Crewing_UserRole            @relation(fields: [Role], references: [Name], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_Users_Crewing_UserRole_Role")
+  Crewing_UserSubRole       Crewing_UserSubRole?        @relation(fields: [SubRole], references: [Name], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Users_Crewing_UserSubRole_SubRole")
+
+  @@index([DivisionId], map: "IX_Crewing_Users_DivisionId")
+  @@index([Role], map: "IX_Crewing_Users_Role")
+  @@index([SubRole], map: "IX_Crewing_Users_SubRole")
+}
+
+model Crewing_UserSubRole {
+  Name                     String                     @id(map: "PK_Crewing_UserSubRole") @db.NVarChar(450)
+  Created                  DateTime
+  CreatedBy                String                     @db.NVarChar(Max)
+  IsDeleted                Boolean
+  Id                       String                     @db.UniqueIdentifier
+  Modified                 DateTime?
+  ModifiedBy               String?                    @db.NVarChar(Max)
+  Crewing_UserAccessMatrix Crewing_UserAccessMatrix[]
+  Crewing_Users            Crewing_Users[]
+}
+
+model Crewing_Vendor {
+  Id             String    @id(map: "PK_Crewing_Vendor") @db.UniqueIdentifier
+  VendorName     String?   @db.VarChar(250)
+  VendorLocation String?   @db.VarChar(250)
+  VendorContact  String?   @db.VarChar(250)
+  Created        DateTime
+  CreatedBy      String    @db.NVarChar(Max)
+  IsDeleted      Boolean
+  Modified       DateTime?
+  ModifiedBy     String?   @db.NVarChar(Max)
+}
+
+model Crewing_Vessel {
+  Id                                 String                               @id(map: "PK_Crewing_Vessel") @db.UniqueIdentifier
+  VesselName                         String?                              @db.NVarChar(255)
+  Cargo                              String?                              @db.NVarChar(255)
+  Fleet                              String?                              @db.NVarChar(255)
+  VesselType                         String?                              @db.NVarChar(255)
+  VesselManagement                   String?                              @db.NVarChar(255)
+  ClusterYTD                         String?                              @db.NVarChar(255)
+  Ownership                          String?                              @db.NVarChar(255)
+  PlanUPP                            String?                              @db.NVarChar(255)
+  TechSuperintendent                 String?                              @db.NVarChar(255)
+  BackUpTechSuperintendent           String?                              @db.NVarChar(255)
+  MarineSuperIntendent               String?                              @db.NVarChar(255)
+  BackUpMarineSuperIntendent         String?                              @db.NVarChar(255)
+  DesignatedPersonAshore             String?                              @db.NVarChar(255)
+  CostCenter                         String?                              @db.NVarChar(255)
+  Flag                               String?                              @db.NVarChar(255)
+  CallSign                           String?                              @db.NVarChar(255)
+  MySAP                              String?                              @db.NVarChar(255)
+  IMONumber                          String?                              @db.NVarChar(255)
+  Class                              String?                              @db.NVarChar(255)
+  Builder                            String?                              @db.NVarChar(255)
+  Construction                       String?                              @db.NVarChar(255)
+  DelivDate                          DateTime?
+  YOB                                Int?
+  Age                                Int?
+  Load                               String?                              @db.NVarChar(255)
+  STS                                Boolean?
+  SIRE                               Boolean?
+  TO2022                             String?                              @db.NVarChar(Max)
+  SPV                                String?                              @db.NVarChar(Max)
+  Contract                           String?                              @db.NVarChar(255)
+  LOA_M                              Decimal?                             @db.Decimal(18, 3)
+  BMLD_M                             Decimal?                             @db.Decimal(18, 3)
+  HMLD_M                             Decimal?                             @db.Decimal(18, 3)
+  Draft_M                            Decimal?                             @db.Decimal(18, 3)
+  DWT                                Decimal?                             @db.Decimal(18, 3)
+  GRT                                Decimal?                             @db.Decimal(18, 3)
+  NRT                                Decimal?                             @db.Decimal(18, 3)
+  COP                                Decimal?                             @db.Decimal(18, 3)
+  SWL                                Decimal?                             @db.Decimal(18, 3)
+  LWT                                Decimal?                             @db.Decimal(18, 3)
+  IGS                                Boolean?
+  COW                                Boolean?
+  ODME                               Boolean?
+  OWS                                Boolean?
+  COT_M3                             Decimal?                             @db.Decimal(18, 3)
+  BC_MFO                             Decimal?                             @db.Decimal(18, 3)
+  BC_MDO                             Decimal?                             @db.Decimal(18, 3)
+  BC_HSD                             Decimal?                             @db.Decimal(18, 3)
+  ME_Maker                           String?                              @db.NVarChar(255)
+  ME_Model                           String?                              @db.NVarChar(255)
+  ME_Power                           String?                              @db.NVarChar(255)
+  AE_Maker                           String?                              @db.NVarChar(255)
+  AE_Model                           String?                              @db.NVarChar(255)
+  AE_Power                           String?                              @db.NVarChar(255)
+  Boiler_Maker                       String?                              @db.NVarChar(255)
+  Boiler_Model                       String?                              @db.NVarChar(255)
+  Comp_Maker                         String?                              @db.NVarChar(255)
+  Comp_Model                         String?                              @db.NVarChar(255)
+  COP_Maker                          String?                              @db.NVarChar(255)
+  COP_Model                          String?                              @db.NVarChar(255)
+  LOP_Maker                          String?                              @db.NVarChar(255)
+  LOP_Model                          String?                              @db.NVarChar(255)
+  FODO_Maker                         String?                              @db.NVarChar(255)
+  FODO_Model                         String?                              @db.NVarChar(255)
+  FG_Maker                           String?                              @db.NVarChar(255)
+  FG_Model                           String?                              @db.NVarChar(255)
+  Paint_Maker                        String?                              @db.NVarChar(255)
+  VesselStatus                       Int
+  ShipId                             Int?
+  DivisionId                         Int?
+  PrincipalName                      String?                              @db.NVarChar(255)
+  PrincipalId                        String?                              @db.UniqueIdentifier
+  Created                            DateTime
+  CreatedBy                          String                               @db.NVarChar(Max)
+  IsDeleted                          Boolean
+  Modified                           DateTime?
+  ModifiedBy                         String?                              @db.NVarChar(Max)
+  OperationArea                      String?                              @db.NVarChar(Max)
+  Crewing_EmployeeAppraisal          Crewing_EmployeeAppraisal[]
+  Crewing_EmployeeBoardSchedule      Crewing_EmployeeBoardSchedule[]
+  Crewing_EmployeePreparationBJST    Crewing_EmployeePreparationBJST[]
+  Crewing_EmployeePreparationMCU     Crewing_EmployeePreparationMCU[]
+  Crewing_EmployeePreparationMedical Crewing_EmployeePreparationMedical[]
+  Crewing_EmployeePreparationPKL     Crewing_EmployeePreparationPKL[]
+  Crewing_EmployeeScheduling         Crewing_EmployeeScheduling[]
+  Crewing_EmployeeSeaService         Crewing_EmployeeSeaService[]
+  Crewing_FoodVesselHistories        Crewing_FoodVesselHistories[]
+  Crewing_Division                   Crewing_Division?                    @relation(fields: [DivisionId], references: [DivisionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Vessel_Crewing_Division_DivisionId")
+  Crewing_Principals                 Crewing_Principals?                  @relation(fields: [PrincipalId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Vessel_Crewing_Principals_PrincipalId")
+  Crewing_Ship                       Crewing_Ship?                        @relation(fields: [ShipId], references: [ShipId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Vessel_Crewing_Ship_ShipId")
+  Crewing_VesselStatus               Crewing_VesselStatus                 @relation(fields: [VesselStatus], references: [VesselStatusId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_Vessel_Crewing_VesselStatus_VesselStatus")
+  Crewing_VesselCrew                 Crewing_VesselCrew[]
+  Crewing_VesselCrewRejection        Crewing_VesselCrewRejection[]
+  Crewing_VesselGanttChart           Crewing_VesselGanttChart[]
+  Crewing_VesselVoyageLog            Crewing_VesselVoyageLog[]
+
+  @@index([DivisionId], map: "IX_Crewing_Vessel_DivisionId")
+  @@index([PrincipalId], map: "IX_Crewing_Vessel_PrincipalId")
+  @@index([ShipId], map: "IX_Crewing_Vessel_ShipId")
+  @@index([VesselStatus], map: "IX_Crewing_Vessel_VesselStatus")
+}
+
+model Crewing_VesselCrew {
+  Id                                                                                            String                     @id(map: "PK_Crewing_VesselCrew") @db.UniqueIdentifier
+  VesselId                                                                                      String                     @db.UniqueIdentifier
+  JobPositionMarineId                                                                           Int?
+  JobPositionTankerId                                                                           Int?
+  PrePreviousEmployeeId                                                                         String?                    @db.UniqueIdentifier
+  PreviousEmployeeId                                                                            String?                    @db.UniqueIdentifier
+  CurrentEmployeeId                                                                             String?                    @db.UniqueIdentifier
+  NextEmployeeId                                                                                String?                    @db.UniqueIdentifier
+  NextButOneEmployeeId                                                                          String?                    @db.UniqueIdentifier
+  PrePreviousEmployeeStatus                                                                     String?                    @db.NVarChar(Max)
+  PreviousEmployeeStatus                                                                        String?                    @db.NVarChar(Max)
+  CurrentEmployeeStatus                                                                         String?                    @db.NVarChar(Max)
+  NextEmployeeStatus                                                                            String?                    @db.NVarChar(Max)
+  NextButOneEmployeeStatus                                                                      String?                    @db.NVarChar(Max)
+  PrePreviousPrincipalStatus                                                                    String?                    @db.NVarChar(Max)
+  PreviousPrincipalStatus                                                                       String?                    @db.NVarChar(Max)
+  CurrentPrincipalStatus                                                                        String?                    @db.NVarChar(Max)
+  NextPrincipalStatus                                                                           String?                    @db.NVarChar(Max)
+  NextButOnePrincipalStatus                                                                     String?                    @db.NVarChar(Max)
+  PrePreviousEmployeeApprovalDate                                                               DateTime?
+  PreviousEmployeeApprovalDate                                                                  DateTime?
+  CurrentEmployeeApprovalDate                                                                   DateTime?
+  NextEmployeeApprovalDate                                                                      DateTime?
+  NextButOneEmployeeApprovalDate                                                                DateTime?
+  PrePreviousPrincipalApprovalDate                                                              DateTime?
+  PreviousPrincipalApprovalDate                                                                 DateTime?
+  CurrentPrincipalApprovalDate                                                                  DateTime?
+  NextPrincipalApprovalDate                                                                     DateTime?
+  NextButOnePrincipalApprovalDate                                                               DateTime?
+  PrePreviousOnBoard                                                                            DateTime?
+  PreviousOnBoard                                                                               DateTime?
+  CurrentOnBoard                                                                                DateTime?
+  NextOnBoard                                                                                   DateTime?
+  NextButOneOnBoard                                                                             DateTime?
+  PrePreviousOffBoard                                                                           DateTime?
+  PreviousOffBoard                                                                              DateTime?
+  CurrentOffBoard                                                                               DateTime?
+  NextOffBoard                                                                                  DateTime?
+  NextButOneOffBoard                                                                            DateTime?
+  PrePreviousGanttChartId                                                                       String?                    @db.UniqueIdentifier
+  PreviousGanttChartId                                                                          String?                    @db.UniqueIdentifier
+  CurrentGanttChartId                                                                           String?                    @db.UniqueIdentifier
+  NextGanttChartId                                                                              String?                    @db.UniqueIdentifier
+  NextButOneGanttChartId                                                                        String?                    @db.UniqueIdentifier
+  Created                                                                                       DateTime
+  CreatedBy                                                                                     String                     @db.NVarChar(Max)
+  IsDeleted                                                                                     Boolean
+  Modified                                                                                      DateTime?
+  ModifiedBy                                                                                    String?                    @db.NVarChar(Max)
+  Crewing_Employee_Crewing_VesselCrew_CurrentEmployeeIdToCrewing_Employee                       Crewing_Employee?          @relation("Crewing_VesselCrew_CurrentEmployeeIdToCrewing_Employee", fields: [CurrentEmployeeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_Employee_CurrentEmployeeId")
+  Crewing_Employee_Crewing_VesselCrew_NextButOneEmployeeIdToCrewing_Employee                    Crewing_Employee?          @relation("Crewing_VesselCrew_NextButOneEmployeeIdToCrewing_Employee", fields: [NextButOneEmployeeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_Employee_NextButOneEmployeeId")
+  Crewing_Employee_Crewing_VesselCrew_NextEmployeeIdToCrewing_Employee                          Crewing_Employee?          @relation("Crewing_VesselCrew_NextEmployeeIdToCrewing_Employee", fields: [NextEmployeeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_Employee_NextEmployeeId")
+  Crewing_Employee_Crewing_VesselCrew_PrePreviousEmployeeIdToCrewing_Employee                   Crewing_Employee?          @relation("Crewing_VesselCrew_PrePreviousEmployeeIdToCrewing_Employee", fields: [PrePreviousEmployeeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_Employee_PrePreviousEmployeeId")
+  Crewing_Employee_Crewing_VesselCrew_PreviousEmployeeIdToCrewing_Employee                      Crewing_Employee?          @relation("Crewing_VesselCrew_PreviousEmployeeIdToCrewing_Employee", fields: [PreviousEmployeeId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_Employee_PreviousEmployeeId")
+  Crewing_JobPositionMarine                                                                     Crewing_JobPositionMarine? @relation(fields: [JobPositionMarineId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_JobPositionMarine_JobPositionMarineId")
+  Crewing_JobPositionTanker                                                                     Crewing_JobPositionTanker? @relation(fields: [JobPositionTankerId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_JobPositionTanker_JobPositionTankerId")
+  Crewing_Vessel                                                                                Crewing_Vessel             @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_Vessel_VesselId")
+  Crewing_VesselGanttChart_Crewing_VesselCrew_CurrentGanttChartIdToCrewing_VesselGanttChart     Crewing_VesselGanttChart?  @relation("Crewing_VesselCrew_CurrentGanttChartIdToCrewing_VesselGanttChart", fields: [CurrentGanttChartId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_VesselGanttChart_CurrentGanttChartId")
+  Crewing_VesselGanttChart_Crewing_VesselCrew_NextButOneGanttChartIdToCrewing_VesselGanttChart  Crewing_VesselGanttChart?  @relation("Crewing_VesselCrew_NextButOneGanttChartIdToCrewing_VesselGanttChart", fields: [NextButOneGanttChartId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_VesselGanttChart_NextButOneGanttChartId")
+  Crewing_VesselGanttChart_Crewing_VesselCrew_NextGanttChartIdToCrewing_VesselGanttChart        Crewing_VesselGanttChart?  @relation("Crewing_VesselCrew_NextGanttChartIdToCrewing_VesselGanttChart", fields: [NextGanttChartId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_VesselGanttChart_NextGanttChartId")
+  Crewing_VesselGanttChart_Crewing_VesselCrew_PrePreviousGanttChartIdToCrewing_VesselGanttChart Crewing_VesselGanttChart?  @relation("Crewing_VesselCrew_PrePreviousGanttChartIdToCrewing_VesselGanttChart", fields: [PrePreviousGanttChartId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_VesselGanttChart_PrePreviousGanttChartId")
+  Crewing_VesselGanttChart_Crewing_VesselCrew_PreviousGanttChartIdToCrewing_VesselGanttChart    Crewing_VesselGanttChart?  @relation("Crewing_VesselCrew_PreviousGanttChartIdToCrewing_VesselGanttChart", fields: [PreviousGanttChartId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselCrew_Crewing_VesselGanttChart_PreviousGanttChartId")
+
+  @@index([CurrentEmployeeId], map: "IX_Crewing_VesselCrew_CurrentEmployeeId")
+  @@index([CurrentGanttChartId], map: "IX_Crewing_VesselCrew_CurrentGanttChartId")
+  @@index([JobPositionMarineId], map: "IX_Crewing_VesselCrew_JobPositionMarineId")
+  @@index([JobPositionTankerId], map: "IX_Crewing_VesselCrew_JobPositionTankerId")
+  @@index([NextButOneEmployeeId], map: "IX_Crewing_VesselCrew_NextButOneEmployeeId")
+  @@index([NextButOneGanttChartId], map: "IX_Crewing_VesselCrew_NextButOneGanttChartId")
+  @@index([NextEmployeeId], map: "IX_Crewing_VesselCrew_NextEmployeeId")
+  @@index([NextGanttChartId], map: "IX_Crewing_VesselCrew_NextGanttChartId")
+  @@index([PrePreviousEmployeeId], map: "IX_Crewing_VesselCrew_PrePreviousEmployeeId")
+  @@index([PrePreviousGanttChartId], map: "IX_Crewing_VesselCrew_PrePreviousGanttChartId")
+  @@index([PreviousEmployeeId], map: "IX_Crewing_VesselCrew_PreviousEmployeeId")
+  @@index([PreviousGanttChartId], map: "IX_Crewing_VesselCrew_PreviousGanttChartId")
+  @@index([VesselId], map: "IX_Crewing_VesselCrew_VesselId")
+}
+
+model Crewing_VesselCrewRejection {
+  Id               String           @id(map: "PK_Crewing_VesselCrewRejection") @db.UniqueIdentifier
+  EmployeeId       String           @db.UniqueIdentifier
+  VesselId         String           @db.UniqueIdentifier
+  RejectionDate    DateTime
+  Created          DateTime
+  CreatedBy        String           @db.NVarChar(Max)
+  IsDeleted        Boolean
+  Modified         DateTime?
+  ModifiedBy       String?          @db.NVarChar(Max)
+  Crewing_Employee Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_VesselCrewRejection_Crewing_Employee_EmployeeId")
+  Crewing_Vessel   Crewing_Vessel   @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_VesselCrewRejection_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_VesselCrewRejection_EmployeeId")
+  @@index([VesselId], map: "IX_Crewing_VesselCrewRejection_VesselId")
+}
+
+model Crewing_VesselGanttChart {
+  Id                                                                                      String                     @id(map: "PK_Crewing_VesselGanttChart") @db.UniqueIdentifier
+  VesselId                                                                                String                     @db.UniqueIdentifier
+  JobPositionMarineId                                                                     Int?
+  JobPositionTankerId                                                                     Int?
+  EmployeeId                                                                              String                     @db.UniqueIdentifier
+  OnBoard                                                                                 DateTime
+  OffBoard                                                                                DateTime
+  Status                                                                                  String                     @db.NVarChar(Max)
+  VesselCrewId                                                                            String                     @db.UniqueIdentifier
+  Created                                                                                 DateTime
+  CreatedBy                                                                               String                     @db.NVarChar(Max)
+  IsDeleted                                                                               Boolean
+  Modified                                                                                DateTime?
+  ModifiedBy                                                                              String?                    @db.NVarChar(Max)
+  OriginalOffBoardDate                                                                    DateTime?
+  Crewing_VesselCrew_Crewing_VesselCrew_CurrentGanttChartIdToCrewing_VesselGanttChart     Crewing_VesselCrew[]       @relation("Crewing_VesselCrew_CurrentGanttChartIdToCrewing_VesselGanttChart")
+  Crewing_VesselCrew_Crewing_VesselCrew_NextButOneGanttChartIdToCrewing_VesselGanttChart  Crewing_VesselCrew[]       @relation("Crewing_VesselCrew_NextButOneGanttChartIdToCrewing_VesselGanttChart")
+  Crewing_VesselCrew_Crewing_VesselCrew_NextGanttChartIdToCrewing_VesselGanttChart        Crewing_VesselCrew[]       @relation("Crewing_VesselCrew_NextGanttChartIdToCrewing_VesselGanttChart")
+  Crewing_VesselCrew_Crewing_VesselCrew_PrePreviousGanttChartIdToCrewing_VesselGanttChart Crewing_VesselCrew[]       @relation("Crewing_VesselCrew_PrePreviousGanttChartIdToCrewing_VesselGanttChart")
+  Crewing_VesselCrew_Crewing_VesselCrew_PreviousGanttChartIdToCrewing_VesselGanttChart    Crewing_VesselCrew[]       @relation("Crewing_VesselCrew_PreviousGanttChartIdToCrewing_VesselGanttChart")
+  Crewing_Employee                                                                        Crewing_Employee           @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_VesselGanttChart_Crewing_Employee_EmployeeId")
+  Crewing_JobPositionMarine                                                               Crewing_JobPositionMarine? @relation(fields: [JobPositionMarineId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselGanttChart_Crewing_JobPositionMarine_JobPositionMarineId")
+  Crewing_JobPositionTanker                                                               Crewing_JobPositionTanker? @relation(fields: [JobPositionTankerId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselGanttChart_Crewing_JobPositionTanker_JobPositionTankerId")
+  Crewing_Vessel                                                                          Crewing_Vessel             @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_VesselGanttChart_Crewing_Vessel_VesselId")
+
+  @@index([EmployeeId], map: "IX_Crewing_VesselGanttChart_EmployeeId")
+  @@index([JobPositionMarineId], map: "IX_Crewing_VesselGanttChart_JobPositionMarineId")
+  @@index([JobPositionTankerId], map: "IX_Crewing_VesselGanttChart_JobPositionTankerId")
+  @@index([VesselId], map: "IX_Crewing_VesselGanttChart_VesselId")
+}
+
+model Crewing_VesselPort {
+  Id                                                                                               String                        @id(map: "PK_Crewing_VesselPort") @db.UniqueIdentifier
+  PortName                                                                                         String?                       @db.NVarChar(250)
+  Created                                                                                          DateTime
+  CreatedBy                                                                                        String                        @db.NVarChar(Max)
+  IsDeleted                                                                                        Boolean
+  Modified                                                                                         DateTime?
+  ModifiedBy                                                                                       String?                       @db.NVarChar(Max)
+  Crewing_EmployeeScheduling_Crewing_EmployeeScheduling_OffBoardLocationPortIdToCrewing_VesselPort Crewing_EmployeeScheduling[]  @relation("Crewing_EmployeeScheduling_OffBoardLocationPortIdToCrewing_VesselPort")
+  Crewing_EmployeeScheduling_Crewing_EmployeeScheduling_OnBoardLocationPortIdToCrewing_VesselPort  Crewing_EmployeeScheduling[]  @relation("Crewing_EmployeeScheduling_OnBoardLocationPortIdToCrewing_VesselPort")
+  Crewing_FoodVesselHistories                                                                      Crewing_FoodVesselHistories[]
+  Crewing_VesselVoyageLog_Crewing_VesselVoyageLog_DestinationPortIdToCrewing_VesselPort            Crewing_VesselVoyageLog[]     @relation("Crewing_VesselVoyageLog_DestinationPortIdToCrewing_VesselPort")
+  Crewing_VesselVoyageLog_Crewing_VesselVoyageLog_OriginPortIdToCrewing_VesselPort                 Crewing_VesselVoyageLog[]     @relation("Crewing_VesselVoyageLog_OriginPortIdToCrewing_VesselPort")
+}
+
+model Crewing_VesselPosition {
+  Id                 String    @id(map: "PK_Crewing_VesselPosition") @db.UniqueIdentifier
+  VesselPositionName String?   @db.NVarChar(250)
+  Created            DateTime
+  CreatedBy          String    @db.NVarChar(Max)
+  IsDeleted          Boolean
+  Modified           DateTime?
+  ModifiedBy         String?   @db.NVarChar(Max)
+}
+
+model Crewing_VesselSize {
+  Id             String    @id(map: "PK_Crewing_VesselSize") @db.UniqueIdentifier
+  VesselSizeName String?   @db.VarChar(150)
+  Created        DateTime
+  CreatedBy      String    @db.NVarChar(Max)
+  IsDeleted      Boolean
+  Modified       DateTime?
+  ModifiedBy     String?   @db.NVarChar(Max)
+}
+
+model Crewing_VesselStatus {
+  VesselStatusId   Int              @id(map: "PK_Crewing_VesselStatus") @default(autoincrement())
+  VesselStatusName String?          @db.NVarChar(250)
+  Created          DateTime
+  CreatedBy        String           @db.NVarChar(Max)
+  IsDeleted        Boolean
+  Id               String           @db.UniqueIdentifier
+  Modified         DateTime?
+  ModifiedBy       String?          @db.NVarChar(Max)
+  Crewing_Vessel   Crewing_Vessel[]
+}
+
+model Crewing_VesselType {
+  Id             String    @id(map: "PK_Crewing_VesselType") @db.UniqueIdentifier
+  VesselTypeName String?   @db.VarChar(150)
+  Created        DateTime
+  CreatedBy      String    @db.NVarChar(Max)
+  IsDeleted      Boolean
+  Modified       DateTime?
+  ModifiedBy     String?   @db.NVarChar(Max)
+}
+
+model Crewing_VesselVoyageLog {
+  Id                                                                               String                    @id(map: "PK_Crewing_VesselVoyageLog") @db.UniqueIdentifier
+  VesselId                                                                         String                    @db.UniqueIdentifier
+  OriginPortId                                                                     String?                   @db.UniqueIdentifier
+  DestinationPortId                                                                String?                   @db.UniqueIdentifier
+  ATD                                                                              DateTime?
+  ETA                                                                              DateTime?
+  VesselPosition                                                                   String?                   @db.NVarChar(Max)
+  NavigationStatusId                                                               String?                   @db.UniqueIdentifier
+  Created                                                                          DateTime
+  CreatedBy                                                                        String                    @db.NVarChar(Max)
+  IsDeleted                                                                        Boolean
+  Modified                                                                         DateTime?
+  ModifiedBy                                                                       String?                   @db.NVarChar(Max)
+  Crewing_NavigationStatus                                                         Crewing_NavigationStatus? @relation(fields: [NavigationStatusId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselVoyageLog_Crewing_NavigationStatus_NavigationStatusId")
+  Crewing_Vessel                                                                   Crewing_Vessel            @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_VesselVoyageLog_Crewing_Vessel_VesselId")
+  Crewing_VesselPort_Crewing_VesselVoyageLog_DestinationPortIdToCrewing_VesselPort Crewing_VesselPort?       @relation("Crewing_VesselVoyageLog_DestinationPortIdToCrewing_VesselPort", fields: [DestinationPortId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselVoyageLog_Crewing_VesselPort_DestinationPortId")
+  Crewing_VesselPort_Crewing_VesselVoyageLog_OriginPortIdToCrewing_VesselPort      Crewing_VesselPort?       @relation("Crewing_VesselVoyageLog_OriginPortIdToCrewing_VesselPort", fields: [OriginPortId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_VesselVoyageLog_Crewing_VesselPort_OriginPortId")
+
+  @@index([DestinationPortId], map: "IX_Crewing_VesselVoyageLog_DestinationPortId")
+  @@index([NavigationStatusId], map: "IX_Crewing_VesselVoyageLog_NavigationStatusId")
+  @@index([OriginPortId], map: "IX_Crewing_VesselVoyageLog_OriginPortId")
+  @@index([VesselId], map: "IX_Crewing_VesselVoyageLog_VesselId")
+}
+
+model Crewing_VesselVoyageStatus {
+  Id          String    @id(map: "PK_Crewing_VesselVoyageStatus") @db.UniqueIdentifier
+  NavalStatus String?   @db.NVarChar(250)
+  Created     DateTime
+  CreatedBy   String    @db.NVarChar(Max)
+  IsDeleted   Boolean
+  Modified    DateTime?
+  ModifiedBy  String?   @db.NVarChar(Max)
+}
