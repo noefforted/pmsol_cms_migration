@@ -11,6 +11,10 @@ def log_begin():
     err_handler = logging.StreamHandler(sys.stderr)
     err_handler.setLevel(logging.ERROR)
 
-    logging.basicConfig(level=logging.INFO, handlers=[out_handler, err_handler], format=os.getenv("LOG_FORMAT").replace("\\t", "\t"))  # type: ignore
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=[out_handler, err_handler],
+        format=os.getenv("LOG_FORMAT", "%(asctime)s - %(levelname)s - %(message)s").replace("\\t", "\t")  # type: ignore
+    )
     logging.getLogger("httpx").setLevel(logging.ERROR)
     logging.getLogger("uvicorn.error").name = "uvicorn"
