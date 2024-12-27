@@ -2,3 +2,7 @@
 venv
 data_source
 log
+node_modules
+__pycache__
+package-lock.json
+package.json

@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider                    = "prisma-client-py"
+  interface                   = "asyncio"
+  enable_experimental_decimal = "true"
 }
 
 datasource db {
@@ -387,7 +389,7 @@ model Crewing_EmployeeAppraisal {
   ReportingPeriodFrom                    String?          @db.NVarChar(250)
   VesselId                               String?          @db.UniqueIdentifier
   NeedRevisionReason                     String?          @db.NVarChar(Max)
-  RevisionNumber                         Int              @default(0, map: "DF__Crewing_E__Revis__02C769E9")
+  RevisionNumber                         Int              @default(0, map: "DF__Crewing_E__Revis__7849DB76")
   Crewing_Employee                       Crewing_Employee @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeAppraisal_Crewing_Employee_EmployeeId")
   Crewing_Vessel                         Crewing_Vessel?  @relation(fields: [VesselId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeAppraisal_Crewing_Vessel_VesselId")
 
@@ -441,7 +443,7 @@ model Crewing_EmployeeBoardSchedule {
   IsDeleted                 Boolean
   Modified                  DateTime?
   ModifiedBy                String?                    @db.NVarChar(Max)
-  IsOnBoard                 Boolean                    @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_E__IsOnB__03BB8E22")
+  IsOnBoard                 Boolean                    @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_E__IsOnB__793DFFAF")
   OriginalOffBoardDate      DateTime?
   Crewing_Employee          Crewing_Employee           @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeBoardSchedule_Crewing_Employee_EmployeeId")
   Crewing_JobPositionMarine Crewing_JobPositionMarine? @relation(fields: [JobPositionMarineId], references: [JobPositionId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_EmployeeBoardSchedule_Crewing_JobPositionMarine_JobPositionMarineId")
@@ -665,14 +667,14 @@ model Crewing_EmployeePreparationPKL {
   Position                   String?          @db.NVarChar(250)
   ShipCrewSealingOfficerName String?          @db.NVarChar(250)
   TotalWages                 String?          @db.NVarChar(250)
-  VesselCrewId               String           @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__04AFB25B") @db.UniqueIdentifier
+  VesselCrewId               String           @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__7A3223E8") @db.UniqueIdentifier
   IDPosition                 String?          @db.NVarChar(250)
   SeamanBookNo               String?          @db.NVarChar(250)
   ShippingArea               String?          @db.NVarChar(250)
-  VesselId                   String           @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__05A3D694") @db.UniqueIdentifier
+  VesselId                   String           @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__7B264821") @db.UniqueIdentifier
   CrewSealingOffice          String?          @db.NVarChar(250)
   FirstPartyOffice           String?          @db.NVarChar(250)
-  IsExpired                  Boolean          @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_E__IsExp__0697FACD")
+  IsExpired                  Boolean          @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_E__IsExp__7C1A6C5A")
   Age                        String?          @db.NVarChar(250)
   BirthPlace                 String?          @db.NVarChar(250)
   CrewName                   String?          @db.NVarChar(250)
@@ -714,7 +716,7 @@ model Crewing_EmployeeScheduling {
   IsDeleted                                                                                Boolean
   Modified                                                                                 DateTime?
   ModifiedBy                                                                               String?                               @db.NVarChar(Max)
-  EmployeeSchedulingStatusId                                                               Int                                   @default(0, map: "DF__Crewing_E__Emplo__078C1F06")
+  EmployeeSchedulingStatusId                                                               Int                                   @default(0, map: "DF__Crewing_E__Emplo__7D0E9093")
   OriginalScheduledOffBoardDate                                                            DateTime?
   OffBoard_Laundry                                                                         String?                               @db.NVarChar(250)
   OffBoard_LocalTransport                                                                  String?                               @db.NVarChar(250)
@@ -732,7 +734,7 @@ model Crewing_EmployeeScheduling {
   OffBoard_DailyAllowance                                                                  String?                               @db.NVarChar(250)
   JobPositionMarineId                                                                      Int?
   JobPositionTankerId                                                                      Int?
-  VesselCrewId                                                                             String                                @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__0880433F") @db.UniqueIdentifier
+  VesselCrewId                                                                             String                                @default(dbgenerated("00000000-0000-0000-0000-000000000000"), map: "DF__Crewing_E__Vesse__7E02B4CC") @db.UniqueIdentifier
   Crewing_Employee                                                                         Crewing_Employee                      @relation(fields: [EmployeeId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_Employee_EmployeeId")
   Crewing_EmployeeSchedulingStatus                                                         Crewing_EmployeeSchedulingStatus      @relation(fields: [EmployeeSchedulingStatusId], references: [EmployeeSchedulingStatusId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_EmployeeSchedulingStatus_EmployeeSchedulingStatusId")
   Crewing_Vessel                                                                           Crewing_Vessel                        @relation(fields: [VesselId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_EmployeeScheduling_Crewing_Vessel_VesselId")
@@ -1045,7 +1047,7 @@ model Crewing_JobPositionMarine {
   Modified                      DateTime?
   ModifiedBy                    String?                         @db.NVarChar(Max)
   LumpsumGrade                  String?                         @db.VarChar(10)
-  IsHead                        Boolean                         @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_J__IsHea__09746778")
+  IsHead                        Boolean                         @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_J__IsHea__7EF6D905")
   BJSTTypeId                    String?                         @db.UniqueIdentifier
   Crewing_Employee              Crewing_Employee[]
   Crewing_EmployeeBoardSchedule Crewing_EmployeeBoardSchedule[]
@@ -1083,7 +1085,7 @@ model Crewing_JobPositionTanker {
   ModifiedBy                    String?                         @db.NVarChar(Max)
   LumpsumGrade                  String?                         @db.VarChar(10)
   LumpsumGradeCategory          String?                         @db.VarChar(50)
-  IsHead                        Boolean                         @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_J__IsHea__0A688BB1")
+  IsHead                        Boolean                         @default(dbgenerated("CONVERT([bit],(0))"), map: "DF__Crewing_J__IsHea__7FEAFD3E")
   BJSTTypeId                    String?                         @db.UniqueIdentifier
   Crewing_Employee              Crewing_Employee[]
   Crewing_EmployeeBoardSchedule Crewing_EmployeeBoardSchedule[]
@@ -1314,7 +1316,7 @@ model Crewing_Principals {
   IsDeleted                  Boolean
   Modified                   DateTime?
   ModifiedBy                 String?                      @db.NVarChar(Max)
-  DivisionId                 Int                          @default(0, map: "DF__Crewing_P__Divis__0B5CAFEA")
+  DivisionId                 Int                          @default(0, map: "DF__Crewing_P__Divis__00DF2177")
   UserId                     String?                      @db.UniqueIdentifier
   Crewing_ContractManagement Crewing_ContractManagement[]
   Crewing_Users              Crewing_Users?               @relation(fields: [UserId], references: [UserId], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_Principals_Crewing_Users_UserId")
@@ -1444,47 +1446,6 @@ model Crewing_RegisterCrew {
   ModifiedBy                                                 String?                              @db.NVarChar(Max)
   RegSeamanBookNo                                            String?                              @db.NVarChar(250)
   TemporaryPassword                                          String?                              @db.NVarChar(250)
-  NIP                                                        String?                              @db.VarChar(20)
-  FirstName                                                  String?                              @db.VarChar(50)
-  LastName                                                   String?                              @db.VarChar(30)
-  NickName                                                   String?                              @db.VarChar(20)
-  Email                                                      String?                              @db.VarChar(50)
-  Password                                                   String?                              @db.VarChar(50)
-  PositionId                                                 Int?
-  StatusRegister                                             String?                              @db.UniqueIdentifier
-  Address                                                    String?                              @db.VarChar(200)
-  BirthLoc                                                   String?                              @db.VarChar(100)
-  BirthDate                                                  DateTime?                            @db.DateTime
-  BirthPlaceId                                               Int?
-  CellPhone                                                  String?                              @db.VarChar(20)
-  Gender                                                     String?                              @db.NChar(1)
-  HomePhone                                                  String?                              @db.VarChar(20)
-  IdentityCardNo                                             String?                              @db.VarChar(30)
-  ReligionId                                                 Int?
-  AddressKtp                                                 String?                              @db.VarChar(200)
-  NPWP                                                       String?                              @db.VarChar(200)
-  KKNumber                                                   String?                              @db.VarChar(25)
-  BPJSKetNumber                                              String?                              @db.VarChar(25)
-  BPJSKesNumber                                              String?                              @db.VarChar(25)
-  BankId                                                     Int?
-  BankAccountNo                                              String?                              @db.VarChar(25)
-  BankAccountName                                            String?                              @db.VarChar(50)
-  BankId2                                                    Int?
-  BankAccountNo2                                             String?                              @db.VarChar(25)
-  BankAccountName2                                           String?                              @db.VarChar(50)
-  Foto                                                       String?                              @db.VarChar(200)
-  MaritalStatusId                                            Int?
-  ShipId                                                     Int?
-  OnBoard                                                    DateTime?                            @db.DateTime
-  OffBoard                                                   DateTime?                            @db.DateTime
-  ShipRejection                                              Int?
-  SeaManBook                                                 String?                              @db.VarChar(50)
-  PasporBook                                                 String?                              @db.VarChar(50)
-  McuIssued                                                  String?                              @db.VarChar(50)
-  RegShipStatusId                                            Int?
-  CompanyId                                                  String?                              @db.UniqueIdentifier
-  CreatedAt                                                  DateTime?                            @db.DateTime
-  UpdatedAt                                                  DateTime?                            @db.DateTime
   Crewing_AssessmentHistory                                  Crewing_AssessmentHistory[]
   Crewing_RegisterCOCDoc                                     Crewing_RegisterCOCDoc[]
   Crewing_RegisterCOPDoc                                     Crewing_RegisterCOPDoc[]
@@ -1766,7 +1727,7 @@ model Crewing_UserAccessMatrix {
   Id                  String               @id(map: "PK_Crewing_UserAccessMatrix") @db.UniqueIdentifier
   Modified            DateTime?
   ModifiedBy          String?              @db.NVarChar(Max)
-  UserAccessName      String               @default("N'", map: "DF__Crewing_U__UserA__0C50D423") @db.NVarChar(50)
+  UserAccessName      String               @default("N'", map: "DF__Crewing_U__UserA__01D345B0") @db.NVarChar(50)
   Crewing_UserAccess  Crewing_UserAccess   @relation(fields: [UserAccessName], references: [AccessName], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_UserAccessMatrix_Crewing_UserAccess_UserAccessName")
   Crewing_UserRole    Crewing_UserRole     @relation(fields: [Role], references: [Name], onDelete: Cascade, onUpdate: NoAction, map: "FK_Crewing_UserAccessMatrix_Crewing_UserRole_Role")
   Crewing_UserSubRole Crewing_UserSubRole? @relation(fields: [SubRole], references: [Name], onDelete: NoAction, onUpdate: NoAction, map: "FK_Crewing_UserAccessMatrix_Crewing_UserSubRole_SubRole")
@@ -1800,7 +1761,7 @@ model Crewing_Users {
   IsDeleted                 Boolean
   Modified                  DateTime?
   ModifiedBy                String?                     @db.NVarChar(Max)
-  DivisionId                Int                         @default(0, map: "DF__Crewing_U__Divis__0D44F85C")
+  DivisionId                Int                         @default(0, map: "DF__Crewing_U__Divis__02C769E9")
   Email                     String                      @db.NVarChar(500)
   EmployeeId                String?                     @db.UniqueIdentifier
   SubRole                   String?                     @db.NVarChar(450)
