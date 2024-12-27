@@ -3,10 +3,10 @@ from repository.extract_repository import ExtractRepository
 from prisma import Prisma
 import pandas as pd
 from data_source import entries
+import service.transform
 from datetime import datetime
-import uuid
 
-log_migrate = logging.getLogger("Log Migraste")
+log_migrate = logging.getLogger("Log Migrate")
 
 class Migrate:
     @staticmethod
@@ -14,22 +14,12 @@ class Migrate:
         prisma = Prisma()
         await prisma.connect()
         try:
-            df = pd.read_csv('data_source/CorePTKDb.City.csv')
-            final_data = [
-                {
-                    "Id": str(uuid.uuid4()),
-                    "CityName": row["Name"],
-                    "Created": datetime.now(),
-                    "CreatedBy": "Migration",
-                    "IsDeleted": False,
-                    "Modified": datetime.now(),
-                    "ModifiedBy": None
-                }
-                for _, row in df.iterrows()
-            ]
+            final_data = await service.transform.crewing_city()
             await prisma.crewing_city.delete_many()
             await prisma.crewing_city.create_many(data=final_data)
-            log_migrate.info("Data City berhasil dimasukkan")
+            log_migrate.info("[Migrated] Data City")
+        except Exception as e:
+            log_migrate.error(f"Error saat memasukkan data City: {e}")
         finally:
             await prisma.disconnect()
 
@@ -40,7 +30,7 @@ class Migrate:
         try:
             # Ambil data dari CSV
             df = await ExtractRepository.get_RegisterCrew()
-            log_migrate.info("Mengambil data dari RegisterCrew")
+            log_migrate.info("[Migrated] Data Register Crew")
             dt_array = df.to_numpy()
 
 
@@ -57,7 +47,9 @@ class Create:
         try:
             await prisma.crewing_bank.delete_many()
             await prisma.crewing_bank.create_many(data=entries.bank_entry)
-            log_create.info("Data Bank berhasil dimasukkan")
+            log_create.info("[Created] Data Bank")
+        except Exception as e:
+            log_create.error(f"Error saat memasukkan data Bank: {e}")
         finally:
             await prisma.disconnect()
 
@@ -68,7 +60,9 @@ class Create:
         try:
             await prisma.crewing_interviewassessor.delete_many()
             await prisma.crewing_interviewassessor.create_many(data=entries.interviewAssessor_entry)
-            log_create.info("Data Interview Assessor berhasil dimasukkan")
+            log_create.info("[Created] Data Interview Assessor")
+        except Exception as e:
+            log_create.error(f"Error saat memasukkan data Interview Assessor: {e}")
         finally:
             await prisma.disconnect()
 
@@ -79,7 +73,9 @@ class Create:
         try:
             await prisma.crewing_maritalstatus.delete_many()
             await prisma.crewing_maritalstatus.create_many(data=entries.maritalStatus_entry)
-            log_create.info("Data Marital Status berhasil dimasukkan")
+            log_create.info("[Created] Data Marital Status")
+        except Exception as e:
+            log_create.error(f"Error saat memasukkan data Marital Status: {e}")
         finally:
             await prisma.disconnect()
 
@@ -90,6 +86,8 @@ class Create:
         try:
             await prisma.crewing_religion.delete_many()
             await prisma.crewing_religion.create_many(data=entries.religion_entry)
-            log_create.info("Data Religion berhasil dimasukkan")
+            log_create.info("[Created] Data Religion")
+        except Exception as e:
+            log_create.error(f"Error saat memasukkan data Religion: {e}")
         finally:
             await prisma.disconnect()
