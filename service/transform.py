@@ -69,6 +69,14 @@ religion_id_to_uuid_mapping = {
     6: "06C27876-50A6-436F-8FDF-1EF0EA6AEB96",  # Konghuchu
 }
 
+marital_status_id_to_uuid_mapping = {
+    1: "6EEBD3CE-9FAD-4566-ABD9-197416643170",  # Single
+    2: "8A821D53-82CA-4DEA-A575-694AEC168322",  # Married
+    3: "7DF630F8-CCCE-42BE-BD00-2617F4109B0A",  # Divorced
+    4: "3930B8E2-CEA5-444F-904B-FC8A0D3857C1",  # Widowed
+    5: "4434851E-BA67-4939-8FDD-8611002E56C2"  # Death Divorced
+}
+
 async def crewing_registerCrew():
     df = await ExtractRepository.get_RegisterCrew()
     df = df.iloc[:150]
@@ -84,7 +92,7 @@ async def crewing_registerCrew():
             "RegPlaceOfBirth": row["BirthLoc"] if row["BirthLoc"] else None,
             "RegDateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
             "RegReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
-            "RegMaritalStatusId": "6EEBD3CE-9FAD-4566-ABD9-197416643170", # belum dimapping
+            "RegMaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
             "RegNationality": None,
             "RegPhotoId": None,
             "RegPassportPhotoId": None,
