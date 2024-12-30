@@ -25,10 +25,10 @@ async def run_all(instance):
         log_main.error(f"Error while running tasks: {e}", exc_info=True)
 
 async def main():
-    log_main.info("============= Starting Migration... =============")
+    log_main.info("========================== Starting Migration... ==========================")
     await run_all(create)
     await run_all(migrate)
-    log_main.info("============= Migration Completed =============")
+    log_main.info("========================== Migration Completed ==========================")
 
 # Run the async main function
 asyncio.run(main())

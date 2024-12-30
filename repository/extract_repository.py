@@ -16,3 +16,9 @@ class ExtractRepository:
         file_path = os.getenv("CITY_FILE_PATH", "./data_source/CorePTKDb.City.csv")
         data = pd.read_csv(file_path)
         return data
+    
+    @staticmethod
+    async def get_Education():
+        file_path = os.getenv("EDUCATION_FILE_PATH", "./data_source/RegisterCrewEducation_202412300826.csv")
+        data = pd.read_csv(file_path)
+        return data
