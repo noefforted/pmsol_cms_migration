@@ -8,7 +8,8 @@ class ExtractRepository:
     @staticmethod
     async def get_RegisterCrew():
         file_path = os.getenv("REGISTERCREW_FILE_PATH", "./data_source/RegisterCrew_202412251246.csv")
-        data = pd.read_csv(file_path)
+        df = pd.read_csv(file_path)
+        data = df.where(pd.notnull(df), None)
         return data
 
     @staticmethod
@@ -22,3 +23,4 @@ class ExtractRepository:
         file_path = os.getenv("EDUCATION_FILE_PATH", "./data_source/RegisterCrewEducation_202412300826.csv")
         data = pd.read_csv(file_path)
         return data
+    
