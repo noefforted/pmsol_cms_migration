@@ -3,6 +3,10 @@ from datetime import datetime
 from repository.extract_repository import ExtractRepository
 from repository.log_repository import LogRepository
 import pandas as pd
+import logging
+
+log_transform = logging.getLogger("Log Transform")
+
 
 async def crewing_city():
     df = await ExtractRepository.get_City()
@@ -24,7 +28,7 @@ async def crewing_school():
     df = await ExtractRepository.get_Education()
     data = [
         {
-            "Id": str(uuid.uuid4()),
+            "Id": row["Id"],
             "SchoolName": row["SchoolName"],
             "Created": datetime.now(),
             "CreatedBy": "Migration",
@@ -77,68 +81,128 @@ marital_status_id_to_uuid_mapping = {
     5: "4434851E-BA67-4939-8FDD-8611002E56C2"  # Death Divorced
 }
 
+isDeleted_mapping = {
+    "N": False,
+    "Y": True
+}
+
 async def crewing_registerCrew():
     df = await ExtractRepository.get_RegisterCrew()
-    df = df.iloc[:150]
-    data = [
-        {
-            "Id": row["Id"],
-            "RegCrewNo": await LogRepository.get_last_regCrewNo() + i + 1,
-            "RegRegisNo": row["NIP"] if row["NIP"] else None,
-            "RegFullName": f"{row['FirstName']} {row['LastName']}".strip() if row['LastName'] else row['FirstName'],
-            "RegAddress": row["Address"] if row["Address"] else None,
-            "RegEmail": row["Email"] if row["Email"] else None,
-            "RegGender": row["Gender"] if row["Gender"] else None,
-            "RegPlaceOfBirth": row["BirthLoc"] if row["BirthLoc"] else None,
-            "RegDateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
-            "RegReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
-            "RegMaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
-            "RegNationality": None,
-            "RegPhotoId": None,
-            "RegPassportPhotoId": None,
-            "RegKtpPhotoId": None,
-            "RegIdCardNo": row["IdentityCardNo"],
-            "RegIdPassport": row["PasporBook"] if row["PasporBook"] else None,
-            "RegFamilyCardNo": row["KKNumber"] if row["KKNumber"] else None,
-            "RegNPWP": row["NPWP"] if row["NPWP"] else None,
-            "RegBPJSKesNo": row["BPJSKesNumber"] if row["BPJSKesNumber"] else None,
-            "RegBPJSTKNo": row["BPJSKetNumber"] if row["BPJSKetNumber"] else None,
-            "RegPhoneNo": str(row["CellPhone"]).strip() if pd.notnull(row["CellPhone"]) else None,
-            "RegRelativesName": None,
-            "RegRelativesEmail": None,
-            "RegRelativesPhone": None,
-            "RegRelativesAddress": None,
-            "RegBankAccount1": row["BankAccountNo"] if row["BankAccountNo"] else None,
-            "RegBankId1": bank_id_to_uuid_mapping.get(row["BankId"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
-            "RegBankAccountName1": row["BankAccountName"] if row["BankAccountName"] else None,
-            "RegBankAccount2": row["BankAccountNo2"] if row["BankAccountNo2"] else None,
-            "RegBankId2": bank_id_to_uuid_mapping.get(row["BankId2"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
-            "RegBankAccountName2": row["BankAccountName2"] if row["BankAccountName2"] else None,
-            "RegDivisionId": 1,
-            "CurrentStatusId": 1, #dummy
-            "JobOpeningId": "2184F223-4B8D-4C1A-9542-3C3DF101492B",
-            "StatusUrl": None,
-            "RegApplyDate": None,
-            "RegSeaFarerId": None,
-            "EmployeeIdNumber": None,
-            "WilingToAcceptLowerRank": None,
-            "AvailableForm": None,
-            "AvailableUntil": None,
-            "Weight": None,
-            "Height": None,
-            "BMI": None,
-            "SafetyShoesSize": None,
-            "TrousersSize": None,
-            "CoverallSize": None,
-            "ShirtSize": None,
-            "Created": datetime.now(),
-            "CreatedBy": "Migration",
-            "IsDeleted": False,
-            "Modified": datetime.now(),
-            "ModifiedBy": None,
-            "RegSeamanBookNo": None,
-            "TemporaryPassword": None
-        }
-        for i, row in df.iterrows()
-    ]
+    # df = df.iloc[:50]
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],
+                "RegCrewNo": await LogRepository.get_last_regCrewNo() + i + 1,
+                "RegRegisNo": row["NIP"] if row["NIP"] else None,
+                "RegFullName": (f"{row['FirstName']} {row['LastName']}".strip() if row.get('FirstName') or row.get('LastName') 
+                                else "Unknown"),
+                "RegAddress": row["Address"] if row["Address"] else None,
+                "RegEmail": row["Email"] if row["Email"] else None,
+                "RegGender": row["Gender"] if row["Gender"] else None,
+                "RegPlaceOfBirth": row["BirthLoc"] if row["BirthLoc"] else None,
+                "RegDateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
+                "RegReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
+                "RegMaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
+                "RegNationality": None,
+                "RegPhotoId": None,
+                "RegPassportPhotoId": None,
+                "RegKtpPhotoId": None,
+                "RegIdCardNo": row["IdentityCardNo"],
+                "RegIdPassport": row["PasporBook"] if row["PasporBook"] else None,
+                "RegFamilyCardNo": row["KKNumber"] if row["KKNumber"] else None,
+                "RegNPWP": row["NPWP"] if row["NPWP"] else None,
+                "RegBPJSKesNo": row["BPJSKesNumber"] if row["BPJSKesNumber"] else None,
+                "RegBPJSTKNo": row["BPJSKetNumber"] if row["BPJSKetNumber"] else None,
+                "RegPhoneNo": str(row["CellPhone"]).strip() if pd.notnull(row["CellPhone"]) else None,
+                "RegRelativesName": None,
+                "RegRelativesEmail": None,
+                "RegRelativesPhone": None,
+                "RegRelativesAddress": None,
+                "RegBankAccount1": row["BankAccountNo"] if row["BankAccountNo"] else None,
+                "RegBankId1": bank_id_to_uuid_mapping.get(row["BankId"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
+                "RegBankAccountName1": row["BankAccountName"] if row["BankAccountName"] else None,
+                "RegBankAccount2": row["BankAccountNo2"] if row["BankAccountNo2"] else None,
+                "RegBankId2": bank_id_to_uuid_mapping.get(row["BankId2"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
+                "RegBankAccountName2": row["BankAccountName2"] if row["BankAccountName2"] else None,
+                "RegDivisionId": 1, #dummy
+                "CurrentStatusId": 1, #dummy
+                "JobOpeningId": "2184F223-4B8D-4C1A-9542-3C3DF101492B",
+                "StatusUrl": None,
+                "RegApplyDate": convert_to_iso(row["CreatedAt"]),
+                "RegSeaFarerId": None,
+                "EmployeeIdNumber": None,
+                "WilingToAcceptLowerRank": None,
+                "AvailableForm": None,
+                "AvailableUntil": None,
+                "Weight": None,
+                "Height": None,
+                "BMI": None,
+                "SafetyShoesSize": None,
+                "TrousersSize": None,
+                "CoverallSize": None,
+                "ShirtSize": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "IsDeleted": isDeleted_mapping.get(row["IsDeleted"], False),
+                "Modified": datetime.now(),
+                "ModifiedBy": None,
+                "RegSeamanBookNo": None,
+                "TemporaryPassword": None
+            }
+            log_transform.info(f"[Transformed] RegisterCrew Data baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
+    return data
+
+
+async def crewing_registerCrewEducation():
+    log_transform = logging.getLogger("Log Transform Education")
+
+    def convert_to_int(year_value):
+        try:
+            # Jika nilai adalah None atau NaN, kembalikan None
+            if pd.isnull(year_value):
+                return None
+            # Jika nilai adalah float atau int, konversi langsung ke int
+            if isinstance(year_value, (float, int)):
+                return int(year_value)
+            # Jika nilai adalah string, cek apakah string mengandung angka
+            return int(year_value[:4]) if year_value and year_value.isdigit() else None
+        except (ValueError, TypeError):
+            return None  # Jika ada error, kembalikan None
+
+    # Fetch data secara asinkron
+    df = await ExtractRepository.get_Education()
+    city = await ExtractRepository.get_City()
+
+    # Buat dictionary lookup untuk city
+    city_lookup = {row["Id"]: row["Name"] for _, row in city.iterrows()}
+
+    # Buat list data
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],
+                "RegisterCrewId": row["CrewID"] if row["CrewID"] else None,
+                "RegEduSchool": row["SchoolName"] if row["SchoolName"] else None,
+                "RegEduDegree": row["Degree"] if row["Degree"] else None,
+                "RegEduMajor": None if pd.isnull(row["Prodi"]) else row["Prodi"],
+                "RegEduGPA": row["Score"] if row["Score"] else None,
+                "RegEduYearAdmission": convert_to_int(row["EntryYear"]),
+                "RegEduYearGraduate": convert_to_int(row["LeaveYear"]),
+                "RegEduCity": city_lookup.get(row["City"], "Unknown"),  # Lookup city name atau gunakan default
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "IsDeleted": isDeleted_mapping.get(row["IsDeleted"], False),
+                "Modified": datetime.now(),
+                "ModifiedBy": None
+            }
+            log_transform.info(f"[Transformed] Data registerCrewEducation baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi registerCrewEducation data baris ke-{i+1}: {transform_error}")
     return data

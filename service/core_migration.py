@@ -53,20 +53,42 @@ class Migrate:
     #     finally:
     #         await prisma.disconnect()
 
+    # @staticmethod
+    # async def register_crew():
+    #     prisma = Prisma()
+    #     await prisma.connect()
+    #     try:
+    #         final_data = await service.transform.crewing_registerCrew()
+    #         await prisma.crewing_registercrew.delete_many()
+
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 await prisma.crewing_registercrew.create(data=row)
+    #                 log_migrate.info(f"[Created] Data RegisterCrew baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat membuat data Register Crew: {item_error} | Data: {row}")
+    #         log_migrate.info(f"[Migrated] {len(final_data)} Data Register Crew")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memasukkan data Register Crew: {e}")
+    #     finally:
+    #         await prisma.disconnect()
+
     @staticmethod
-    async def register_crew():
+    async def crewing_registerCrewEducation():
         prisma = Prisma()
         await prisma.connect()
         try:
-            final_data = await service.transform.crewing_registerCrew()
-            log_migrate.info(f"Starting migration for {len(final_data)} records at {datetime.now()}")
-            # log_migrate.info(f"Final Data: {final_data}")
-            await prisma.crewing_registercrew.delete_many()
-            log_migrate.info("Deleted existing records")
-            await prisma.crewing_registercrew.create_many(data=final_data)
-            log_migrate.info(f"[Migrated] {len(final_data)} Data Register Crew")
+            final_data = await service.transform.crewing_registerCrewEducation()
+            await prisma.crewing_registereducation.delete_many()
+            for index, row in enumerate(final_data, start=1):
+                try:
+                    await prisma.crewing_registereducation.create(data=row)
+                    log_migrate.info(f"[Created] Data RegisterCrewEducation baris ke-{index}")
+                except Exception as item_error:
+                    log_migrate.error(f"Error saat membuat data Register Crew Education: {item_error} | Data: {row}")
+            log_migrate.info(f"[Migrated] {len(final_data)} Data Register Crew Education")
         except Exception as e:
-            log_migrate.error(f"Error saat memasukkan data Register Crew: {e}")
+            log_migrate.error(f"Error saat memasukkan data Register Crew Education: {e}")
         finally:
             await prisma.disconnect()
 
