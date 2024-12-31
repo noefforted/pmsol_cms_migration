@@ -206,3 +206,74 @@ async def crewing_registerCrewEducation():
         except Exception as transform_error:
             log_transform.error(f"Error saat transformasi registerCrewEducation data baris ke-{i+1}: {transform_error}")
     return data
+
+async def crewing_employee():
+    df = await ExtractRepository.get_RegisterCrew()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],
+                "FullName": (f"{row['FirstName']} {row['LastName']}".strip() if row.get('FirstName') or row.get('LastName') 
+                                else "Unknown"),
+                "Address": row["Address"],
+                "Email": row["Email"],
+                "Gender": row["Gender"],
+                "PlaceOfBirth": row["BirthLoc"],
+                "DateOfBirth": row["BirthDate"],
+                "ReligionId": religion_id_mapping.get(row["ReligionId"]),
+                "Nationality": row["Nationality"],
+                "PhotoId": row["Foto"],
+                "PassportPhotoId": row["PasporBook"],
+                "KtpPhotoId": row["Foto"],
+                "IdCardNo": row["IdentityCardNo"],
+                "IdPassport": row["PasporBook"],
+                "FamilyCardNo": row["KKNumber"],
+                "NPWP": row["NPWP"],
+                "BPJSKesNo": row["BPJSKesNumber"],
+                "BPJSTKNo": row["BPJSKetNumber"],
+                "PhoneNo": row["CellPhone"],
+                "RelativesName": None,
+                "RelativesEmail": None,
+                "RelativesPhone": None,
+                "RelativesAddress": None,
+                "BankAccount1": row["BankAccountNo"],
+                "BankId1": bank_id_mapping.get(row["BankId"]),
+                "BankAccountName1": row["BankAccountName"],
+                "BankAccount2": row["BankAccountNo2"],
+                "BankId2": bank_id_mapping.get(row["BankId2"]),
+                "BankAccountName2": row["BankAccountName2"],
+                "DivisionId": row["DivisionId"],
+                "EmployeeIdNumber": row["NIP"],
+                "OnBoardStatus": bool(row["OnBoard"]),
+                "ShipId": row["ShipId"],
+                "MaritalStatusId": marital_status_mapping.get(row["MaritalStatusId"]),
+                "SeaFarerId": row["SeaManBook"],
+                "RegisterCrewId": row["Id"],
+                "IsResigned": False,
+                "EmploymentTypeId": employment_type_mapping.get(row["EmploymentTypeId"]),
+                "JobPositionMarineId": row["PositionId"] if row["PositionId"] in marine_position_mapping else None,
+                "JobPositionTankerId": row["PositionId"] if row["PositionId"] in tanker_position_mapping else None,
+                "LastRejectedDate": None,
+                "WilingToAcceptLowerRank": row["WilingToAcceptLowerRank"],
+                "AvailableForm": row["AvailableForm"],
+                "AvailableUntil": row["AvailableUntil"],
+                "Weight": row["Weight"],
+                "Height": row["Height"],
+                "BMI": row["BMI"],
+                "SafetyShoesSize": row["SafetyShoesSize"],
+                "TrousersSize": row["TrousersSize"],
+                "CoverallSize": row["CoverallSize"],
+                "ShirtSize": row["ShirtSize"],
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "IsDeleted": row["IsDeleted"] == "Y",
+                "Modified": datetime.now(),
+                "ModifiedBy": None,
+                "SeamanBookNo": row["SeaManBook"]
+            }
+            log_transform.info(f"[Transformed] RegisterCrew Data baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
+    return data
