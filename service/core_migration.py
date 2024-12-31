@@ -5,37 +5,40 @@ import pandas as pd
 from data_source import entries
 import service.transform
 from datetime import datetime
+from util.decorator import priority
 
 log_migrate = logging.getLogger("Log Migrate")
 
 class Migrate:
     @staticmethod
-    async def dummy():
+    def dummy():
         pass
 
     # @staticmethod
-    # async def crewing_city():
+    # @priority(1)
+    # def crewing_city():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         final_data = await service.transform.crewing_city()
-    #         await prisma.crewing_city.delete_many()
-    #         await prisma.crewing_city.create_many(data=final_data)
+    #         final_data = service.transform.crewing_city()
+    #         prisma.crewing_city.delete_many()
+    #         prisma.crewing_city.create_many(data=final_data)
     #         log_migrate.info("[Migrated] Data City")
     #     except Exception as e:
     #         log_migrate.error(f"Error saat memasukkan data City: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_school():
+    # @priority(2)
+    # def crewing_school():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         final_data = await service.transform.crewing_school()
+    #         final_data = service.transform.crewing_school()
     #         seen = set() 
     #         unique_data = []
-    #         existing_data = await prisma.crewing_school.find_many()
+    #         existing_data = prisma.crewing_school.find_many()
     #         existing_set = {record["SchoolName"] for record in existing_data}
     #         for record in final_data:
     #             unique_key = record["SchoolName"]
@@ -44,45 +47,47 @@ class Migrate:
     #                 unique_data.append(record)
 
     #         if unique_data:
-    #             await prisma.crewing_school.create_many(data=unique_data)
+    #             prisma.crewing_school.create_many(data=unique_data)
     #             log_migrate.info(f"[Migrated] {len(unique_data)} unique records to Data School")
     #         else:
     #             log_migrate.info("No unique records to migrate.")
     #     except Exception as e:
     #         log_migrate.error(f"Error saat memasukkan data School: {e}")
     #     finally:
-    #         await prisma.disconnect()
-
-    # @staticmethod
-    # async def register_crew():
-    #     prisma = Prisma()
-    #     await prisma.connect()
-    #     try:
-    #         final_data = await service.transform.crewing_registerCrew()
-    #         await prisma.crewing_registercrew.delete_many()
-
-    #         for index, row in enumerate(final_data, start=1):
-    #             try:
-    #                 await prisma.crewing_registercrew.create(data=row)
-    #                 log_migrate.info(f"[Created] Data RegisterCrew baris ke-{index}")
-    #             except Exception as item_error:
-    #                 log_migrate.error(f"Error saat membuat data Register Crew: {item_error} | Data: {row}")
-    #         log_migrate.info(f"[Migrated] {len(final_data)} Data Register Crew")
-    #     except Exception as e:
-    #         log_migrate.error(f"Error saat memasukkan data Register Crew: {e}")
-    #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     @staticmethod
-    async def crewing_registerCrewEducation():
+    @priority(3)
+    def register_crew():
         prisma = Prisma()
-        await prisma.connect()
+        prisma.connect()
         try:
-            final_data = await service.transform.crewing_registerCrewEducation()
-            await prisma.crewing_registereducation.delete_many()
+            final_data = service.transform.crewing_registerCrew()
+            prisma.crewing_registercrew.delete_many()
+
             for index, row in enumerate(final_data, start=1):
                 try:
-                    await prisma.crewing_registereducation.create(data=row)
+                    prisma.crewing_registercrew.create(data=row)
+                    log_migrate.info(f"[Created] Data RegisterCrew baris ke-{index}")
+                except Exception as item_error:
+                    log_migrate.error(f"Error saat membuat data Register Crew: {item_error} | Data: {row}")
+            log_migrate.info(f"[Migrated] {len(final_data)} Data Register Crew")
+        except Exception as e:
+            log_migrate.error(f"Error saat memasukkan data Register Crew: {e}")
+        finally:
+            prisma.disconnect()
+
+    @staticmethod
+    @priority(4)
+    def crewing_registerCrewEducation():
+        prisma = Prisma()
+        prisma.connect()
+        try:
+            final_data = service.transform.crewing_registerCrewEducation()
+            prisma.crewing_registereducation.delete_many()
+            for index, row in enumerate(final_data, start=1):
+                try:
+                    prisma.crewing_registereducation.create(data=row)
                     log_migrate.info(f"[Created] Data RegisterCrewEducation baris ke-{index}")
                 except Exception as item_error:
                     log_migrate.error(f"Error saat membuat data Register Crew Education: {item_error} | Data: {row}")
@@ -90,244 +95,244 @@ class Migrate:
         except Exception as e:
             log_migrate.error(f"Error saat memasukkan data Register Crew Education: {e}")
         finally:
-            await prisma.disconnect()
+            prisma.disconnect()
 
 log_create = logging.getLogger("Log Create")
 class Create:
     @staticmethod
-    async def dummy():
+    def dummy():
         pass
 
     # @staticmethod
-    # async def crewing_bank():
+    # def crewing_bank():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_bank.delete_many()
-    #         await prisma.crewing_bank.create_many(data=entries.bank_entry)
+    #         prisma.crewing_bank.delete_many()
+    #         prisma.crewing_bank.create_many(data=entries.bank_entry)
     #         log_create.info("[Created] Data Bank")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Bank: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_interviewAssessor():
+    # def crewing_interviewAssessor():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_interviewassessor.delete_many()
-    #         await prisma.crewing_interviewassessor.create_many(data=entries.interviewAssessor_entry)
+    #         prisma.crewing_interviewassessor.delete_many()
+    #         prisma.crewing_interviewassessor.create_many(data=entries.interviewAssessor_entry)
     #         log_create.info("[Created] Data Interview Assessor")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Interview Assessor: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_maritalStatus():
+    # def crewing_maritalStatus():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_maritalstatus.delete_many()
-    #         await prisma.crewing_maritalstatus.create_many(data=entries.maritalStatus_entry)
+    #         prisma.crewing_maritalstatus.delete_many()
+    #         prisma.crewing_maritalstatus.create_many(data=entries.maritalStatus_entry)
     #         log_create.info("[Created] Data Marital Status")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Marital Status: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_religion():
+    # def crewing_religion():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_religion.delete_many()
-    #         await prisma.crewing_religion.create_many(data=entries.religion_entry)
+    #         prisma.crewing_religion.delete_many()
+    #         prisma.crewing_religion.create_many(data=entries.religion_entry)
     #         log_create.info("[Created] Data Religion")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Religion: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_degree():
+    # def crewing_degree():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_degree.delete_many()
-    #         await prisma.crewing_degree.create_many(data=entries.degree_entry)
+    #         prisma.crewing_degree.delete_many()
+    #         prisma.crewing_degree.create_many(data=entries.degree_entry)
     #         log_create.info("[Created] Data Degree")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Degree: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
         
     # @staticmethod
-    # async def crewing_designatedPersonAshore():
+    # def crewing_designatedPersonAshore():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_designatedpersonashore.delete_many()
-    #         await prisma.crewing_designatedpersonashore.create_many(data=entries.designatedPersonAshore_entry)
+    #         prisma.crewing_designatedpersonashore.delete_many()
+    #         prisma.crewing_designatedpersonashore.create_many(data=entries.designatedPersonAshore_entry)
     #         log_create.info("[Created] Data Designated Person Ashore")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Designated Person Ashore: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_firstParty():
+    # def crewing_firstParty():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_firstparty.delete_many()
-    #         await prisma.crewing_firstparty.create_many(data=entries.firstParty_entry)
+    #         prisma.crewing_firstparty.delete_many()
+    #         prisma.crewing_firstparty.create_many(data=entries.firstParty_entry)
     #         log_create.info("[Created] Data First Party")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data First Party: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_instituion():
+    # def crewing_instituion():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_institution.delete_many()
-    #         await prisma.crewing_institution.create_many(data=entries.institution_entry)
+    #         prisma.crewing_institution.delete_many()
+    #         prisma.crewing_institution.create_many(data=entries.institution_entry)
     #         log_create.info("[Created] Data Institution")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Institution: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_jobPositionSeaService():
+    # def crewing_jobPositionSeaService():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_jobpositionseaservice.delete_many()
-    #         await prisma.crewing_jobpositionseaservice.create_many(data=entries.jobPositionSeaService_entry)
+    #         prisma.crewing_jobpositionseaservice.delete_many()
+    #         prisma.crewing_jobpositionseaservice.create_many(data=entries.jobPositionSeaService_entry)
     #         log_create.info("[Created] Data Job Position Sea Service")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Job Position Sea Service: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_major():
+    # def crewing_major():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_major.delete_many()
-    #         await prisma.crewing_major.create_many(data=entries.major_entry)
+    #         prisma.crewing_major.delete_many()
+    #         prisma.crewing_major.create_many(data=entries.major_entry)
     #         log_create.info("[Created] Data Major")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Major: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_marineSuperintendent():
+    # def crewing_marineSuperintendent():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_marinesuperintendent.delete_many()
-    #         await prisma.crewing_marinesuperintendent.create_many(data=entries.marineSuperintendent_entry)
+    #         prisma.crewing_marinesuperintendent.delete_many()
+    #         prisma.crewing_marinesuperintendent.create_many(data=entries.marineSuperintendent_entry)
     #         log_create.info("[Created] Data Marine Superintendent")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Marine Superintendent: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_sealingOfficer():
+    # def crewing_sealingOfficer():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_sealingofficer.delete_many()
-    #         await prisma.crewing_sealingofficer.create_many(data=entries.sealingOfficer_entry)
+    #         prisma.crewing_sealingofficer.delete_many()
+    #         prisma.crewing_sealingofficer.create_many(data=entries.sealingOfficer_entry)
     #         log_create.info("[Created] Data Sealing Officer")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Sealing Officer: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
     
     # @staticmethod
-    # async def crewing_shippingArea():
+    # def crewing_shippingArea():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_shippingarea.delete_many()
-    #         await prisma.crewing_shippingarea.create_many(data=entries.shippingArea_entry)
+    #         prisma.crewing_shippingarea.delete_many()
+    #         prisma.crewing_shippingarea.create_many(data=entries.shippingArea_entry)
     #         log_create.info("[Created] Data Shipping Area")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Shipping Area: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_technicalSuperintendent():
+    # def crewing_technicalSuperintendent():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_technicalsuperintendent.delete_many()
-    #         await prisma.crewing_technicalsuperintendent.create_many(data=entries.technicalSuperintendent_entry)
+    #         prisma.crewing_technicalsuperintendent.delete_many()
+    #         prisma.crewing_technicalsuperintendent.create_many(data=entries.technicalSuperintendent_entry)
     #         log_create.info("[Created] Data Technical Superintendent")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Technical Superintendent: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_training():
+    # def crewing_training():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_training.delete_many()
-    #         await prisma.crewing_training.create_many(data=entries.training_entry)
+    #         prisma.crewing_training.delete_many()
+    #         prisma.crewing_training.create_many(data=entries.training_entry)
     #         log_create.info("[Created] Data Training")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Training: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_vendor():
+    # def crewing_vendor():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_vendor.delete_many()
-    #         await prisma.crewing_vendor.create_many(data=entries.vendor_entry)
+    #         prisma.crewing_vendor.delete_many()
+    #         prisma.crewing_vendor.create_many(data=entries.vendor_entry)
     #         log_create.info("[Created] Data Vendor")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Vendor: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_vesselType():
+    # def crewing_vesselType():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_vesseltype.delete_many()
-    #         await prisma.crewing_vesseltype.create_many(data=entries.vesselType_entry)
+    #         prisma.crewing_vesseltype.delete_many()
+    #         prisma.crewing_vesseltype.create_many(data=entries.vesselType_entry)
     #         log_create.info("[Created] Data Vessel Type")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Vessel Type: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()
 
     # @staticmethod
-    # async def crewing_jobOpening():
+    # def crewing_jobOpening():
     #     prisma = Prisma()
-    #     await prisma.connect()
+    #     prisma.connect()
     #     try:
-    #         await prisma.crewing_jobopening.delete_many()
-    #         await prisma.crewing_jobopening.create_many(data=entries.jobOpening_entry)
+    #         prisma.crewing_jobopening.delete_many()
+    #         prisma.crewing_jobopening.create_many(data=entries.jobOpening_entry)
     #         log_create.info("[Created] Data Job Opening")
     #     except Exception as e:
     #         log_create.error(f"Error saat memasukkan data Job Opening: {e}")
     #     finally:
-    #         await prisma.disconnect()
+    #         prisma.disconnect()

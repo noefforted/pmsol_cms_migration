@@ -8,8 +8,8 @@ import logging
 log_transform = logging.getLogger("Log Transform")
 
 
-async def crewing_city():
-    df = await ExtractRepository.get_City()
+def crewing_city():
+    df = ExtractRepository.get_City()
     data = [
         {
             "Id": str(uuid.uuid4()),
@@ -24,8 +24,8 @@ async def crewing_city():
     ]
     return data
 
-async def crewing_school():
-    df = await ExtractRepository.get_Education()
+def crewing_school():
+    df = ExtractRepository.get_Education()
     data = [
         {
             "Id": row["Id"],
@@ -86,18 +86,18 @@ isDeleted_mapping = {
     "Y": True
 }
 
-async def crewing_registerCrew():
-    df = await ExtractRepository.get_RegisterCrew()
-    # df = df.iloc[:50]
+def crewing_registerCrew():
+    df = ExtractRepository.get_RegisterCrew()
+    # df = df.iloc[:10]
     data = []
     for i, row in df.iterrows():
         try:
             transformed_data = {
                 "Id": row["Id"],
-                "RegCrewNo": await LogRepository.get_last_regCrewNo() + i + 1,
+                "RegCrewNo": LogRepository.get_last_regCrewNo() + i + 1,
                 "RegRegisNo": row["NIP"] if row["NIP"] else None,
-                "RegFullName": (f"{row['FirstName']} {row['LastName']}".strip() if row.get('FirstName') or row.get('LastName') 
-                                else "Unknown"),
+                "RegFullName": " ".join(filter(None, [row.get('FirstName'), row.get('LastName')])).strip() 
+                if row.get('FirstName') or row.get('LastName') else "Unknown",
                 "RegAddress": row["Address"] if row["Address"] else None,
                 "RegEmail": row["Email"] if row["Email"] else None,
                 "RegGender": row["Gender"] if row["Gender"] else None,
@@ -109,7 +109,7 @@ async def crewing_registerCrew():
                 "RegPhotoId": None,
                 "RegPassportPhotoId": None,
                 "RegKtpPhotoId": None,
-                "RegIdCardNo": row["IdentityCardNo"],
+                "RegIdCardNo": row["IdentityCardNo"] if row["IdentityCardNo"] else None,
                 "RegIdPassport": row["PasporBook"] if row["PasporBook"] else None,
                 "RegFamilyCardNo": row["KKNumber"] if row["KKNumber"] else None,
                 "RegNPWP": row["NPWP"] if row["NPWP"] else None,
@@ -158,7 +158,7 @@ async def crewing_registerCrew():
     return data
 
 
-async def crewing_registerCrewEducation():
+def crewing_registerCrewEducation():
     log_transform = logging.getLogger("Log Transform Education")
 
     def convert_to_int(year_value):
@@ -175,8 +175,8 @@ async def crewing_registerCrewEducation():
             return None  # Jika ada error, kembalikan None
 
     # Fetch data secara asinkron
-    df = await ExtractRepository.get_Education()
-    city = await ExtractRepository.get_City()
+    df = ExtractRepository.get_Education()
+    city = ExtractRepository.get_City()
 
     # Buat dictionary lookup untuk city
     city_lookup = {row["Id"]: row["Name"] for _, row in city.iterrows()}
@@ -207,47 +207,46 @@ async def crewing_registerCrewEducation():
             log_transform.error(f"Error saat transformasi registerCrewEducation data baris ke-{i+1}: {transform_error}")
     return data
 
-async def crewing_employee():
-    df = await ExtractRepository.get_RegisterCrew()
+def crewing_employee():
+    df = ExtractRepository.get_RegisterCrew()
     data = []
     for i, row in df.iterrows():
         try:
             transformed_data = {
                 "Id": row["Id"],
-                "FullName": (f"{row['FirstName']} {row['LastName']}".strip() if row.get('FirstName') or row.get('LastName') 
-                                else "Unknown"),
-                "Address": row["Address"],
-                "Email": row["Email"],
-                "Gender": row["Gender"],
-                "PlaceOfBirth": row["BirthLoc"],
-                "DateOfBirth": row["BirthDate"],
-                "ReligionId": religion_id_mapping.get(row["ReligionId"]),
-                "Nationality": row["Nationality"],
-                "PhotoId": row["Foto"],
-                "PassportPhotoId": row["PasporBook"],
-                "KtpPhotoId": row["Foto"],
-                "IdCardNo": row["IdentityCardNo"],
-                "IdPassport": row["PasporBook"],
-                "FamilyCardNo": row["KKNumber"],
-                "NPWP": row["NPWP"],
-                "BPJSKesNo": row["BPJSKesNumber"],
-                "BPJSTKNo": row["BPJSKetNumber"],
-                "PhoneNo": row["CellPhone"],
+                "RegFullName": f"{row['FirstName']} {row['LastName']}".strip() if row['FirstName'] or row['LastName'] else "Unknown",
+                "Address": row["Address"] if row["Address"] else None,
+                "Email": row["Email"] if row["Email"] else None,
+                "Gender": row["Gender"] if row["Gender"] else None,
+                "PlaceOfBirth": row["BirthLoc"] if row["BirthLoc"] else None,
+                "DateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
+                "ReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
+                "Nationality": None,
+                "PhotoId": None,
+                "PassportPhotoId": None,
+                "KtpPhotoId": None,
+                "IdCardNo": row["IdentityCardNo"] if row["IdentityCardNo"] else None,
+                "IdPassport": row["PasporBook"] if row["PasporBook"] else None,
+                "FamilyCardNo": row["KKNumber"] if row["KKNumber"] else None,
+                "NPWP": row["NPWP"] if row["NPWP"] else None,
+                "BPJSKesNo": row["BPJSKesNumber"] if row["BPJSKesNumber"] else None,
+                "BPJSTKNo": row["BPJSKetNumber"] if row["BPJSKetNumber"] else None,
+                "PhoneNo": str(row["CellPhone"]).strip() if pd.notnull(row["CellPhone"]) else None,
                 "RelativesName": None,
                 "RelativesEmail": None,
                 "RelativesPhone": None,
                 "RelativesAddress": None,
-                "BankAccount1": row["BankAccountNo"],
-                "BankId1": bank_id_mapping.get(row["BankId"]),
-                "BankAccountName1": row["BankAccountName"],
-                "BankAccount2": row["BankAccountNo2"],
-                "BankId2": bank_id_mapping.get(row["BankId2"]),
-                "BankAccountName2": row["BankAccountName2"],
+                "BankAccount1": row["BankAccountNo"] if row["BankAccountNo"] else None,
+                "BankId1": bank_id_to_uuid_mapping.get(row["BankId"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
+                "BankAccountName1": row["BankAccountName"] if row["BankAccountName"] else None,
+                "BankAccount2": row["BankAccountNo2"] if row["BankAccountNo2"] else None,
+                "BankId2": bank_id_to_uuid_mapping.get(row["BankId2"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
+                "BankAccountName2": row["BankAccountName2"] if row["BankAccountName2"] else None,
                 "DivisionId": row["DivisionId"],
                 "EmployeeIdNumber": row["NIP"],
                 "OnBoardStatus": bool(row["OnBoard"]),
                 "ShipId": row["ShipId"],
-                "MaritalStatusId": marital_status_mapping.get(row["MaritalStatusId"]),
+                "MaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
                 "SeaFarerId": row["SeaManBook"],
                 "RegisterCrewId": row["Id"],
                 "IsResigned": False,

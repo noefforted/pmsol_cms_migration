@@ -4,5 +4,5 @@ prisma = Prisma()
 
 class LoadRepository:
     @staticmethod
-    async def RegisterCrew_create(data):
-        return await prisma.crewing_registercrew.create(data=data)
+    def RegisterCrew_create(data):
+        return prisma.crewing_registercrew.create(data=data)
