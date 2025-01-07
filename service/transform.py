@@ -4,6 +4,7 @@ from repository.extract_repository import ExtractRepository
 from repository.log_repository import LogRepository
 import pandas as pd
 import logging
+import random
 
 log_transform = logging.getLogger("Log Transform")
 
@@ -105,14 +106,14 @@ def crewing_registerCrew():
                 "RegDateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
                 "RegReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
                 "RegMaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
-                "RegNationality": None,
+                "RegNationality": "Indonesia",
                 "RegPhotoId": None,
                 "RegPassportPhotoId": None,
                 "RegKtpPhotoId": None,
                 "RegIdCardNo": row["IdentityCardNo"] if row["IdentityCardNo"] else None,
                 "RegIdPassport": row["PasporBook"] if row["PasporBook"] else None,
                 "RegFamilyCardNo": row["KKNumber"] if row["KKNumber"] else None,
-                "RegNPWP": row["NPWP"] if row["NPWP"] else None,
+                "RegNPWP": row["NPWP"].replace('.', '') if row["NPWP"] else None,
                 "RegBPJSKesNo": row["BPJSKesNumber"] if row["BPJSKesNumber"] else None,
                 "RegBPJSTKNo": row["BPJSKetNumber"] if row["BPJSKetNumber"] else None,
                 "RegPhoneNo": str(row["CellPhone"]).strip() if pd.notnull(row["CellPhone"]) else None,
@@ -157,22 +158,21 @@ def crewing_registerCrew():
             log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
     return data
 
+def convert_to_int(year_value):
+    try:
+        # Jika nilai adalah None atau NaN, kembalikan None
+        if pd.isnull(year_value):
+            return None
+        # Jika nilai adalah float atau int, konversi langsung ke int
+        if isinstance(year_value, (float, int)):
+            return int(year_value)
+        # Jika nilai adalah string, cek apakah string mengandung angka
+        return int(year_value[:4]) if year_value and year_value.isdigit() else None
+    except (ValueError, TypeError):
+        return None  # Jika ada error, kembalikan None
 
 def crewing_registerCrewEducation():
     log_transform = logging.getLogger("Log Transform Education")
-
-    def convert_to_int(year_value):
-        try:
-            # Jika nilai adalah None atau NaN, kembalikan None
-            if pd.isnull(year_value):
-                return None
-            # Jika nilai adalah float atau int, konversi langsung ke int
-            if isinstance(year_value, (float, int)):
-                return int(year_value)
-            # Jika nilai adalah string, cek apakah string mengandung angka
-            return int(year_value[:4]) if year_value and year_value.isdigit() else None
-        except (ValueError, TypeError):
-            return None  # Jika ada error, kembalikan None
 
     # Fetch data secara asinkron
     df = ExtractRepository.get_Education()
@@ -207,28 +207,264 @@ def crewing_registerCrewEducation():
             log_transform.error(f"Error saat transformasi registerCrewEducation data baris ke-{i+1}: {transform_error}")
     return data
 
-def crewing_employee():
+def crewing_registerFamily():
     df = ExtractRepository.get_RegisterCrew()
     data = []
     for i, row in df.iterrows():
         try:
             transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "RegisterCrewId": row["Id"],
+                "Relationship": None,
+                "Fullname": None,
+                "Gender": None,
+                "DateOfBirth": None,
+                "MobileNo": None,
+                "Email": None,
+                "KtpNumber": None,
+                "FamilyRegisterNumber": None,
+                "Address": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data registerFamily baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi registerFamily data baris ke-{i+1}: {transform_error}")
+    return data
+
+def crewing_registerMedicalCertificate():
+    try:
+        # Fetching data from repositories
+        df = ExtractRepository.get_RegisterCrew()
+        data_cE = LogRepository.get_crewing_registerCrew()
+        data_cE = pd.DataFrame([dict(item) for item in data_cE])  # Convert to DataFrame
+
+        data = []
+        for i, row in df.iterrows():
+            try:
+                # Filter to find the corresponding RegPhotoId
+                attachment_file_id = data_cE.loc[data_cE["Id"] == row["Id"], "RegPhotoId"].iloc[0] if not data_cE.loc[data_cE["Id"] == row["Id"]].empty else None
+                
+                # Prepare transformed data
+                transformed_data = {
+                    "Id": str(uuid.uuid4()),
+                    "RegisterCrewId": row["Id"],
+                    "MedicalCertificateName": "MCU",
+                    "Number": None,
+                    "PlaceOfIssue": None,
+                    "DateOfIssue": None,
+                    "ExpirationDate": None,
+                    "AttachmentFileId": attachment_file_id,
+                    "Created": datetime.now(),
+                    "CreatedBy": "Migration",
+                    "Modified": None,
+                    "ModifiedBy": None,
+                    "IsDeleted": False
+                }
+                
+                log_transform.info(f"[Transformed] Data registerMedicalCertificate row {i + 1} transformed successfully.")
+                data.append(transformed_data)
+
+            except Exception as transform_error:
+                log_transform.error(f"Error transforming row {i + 1}: {transform_error}")
+
+        return data
+
+    except Exception as e:
+        log_transform.error(f"Critical error in crewing_registerMedicalCertificate: {e}")
+        return []
+    
+def crewing_registerSeaService():
+    # Mengambil data dari repository
+    df = ExtractRepository.get_RegisterCrew()
+    data = []
+    
+    for i, row in df.iterrows():
+        try:
+            # Data transformasi sesuai dengan kolom di tabel Crewing_RegisterSeaService
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "RegisterCrewId": row["Id"],
+                "RegSeaServiceCompanyName": None,  # Nama Perusahaan
+                "RegSeaServicePosition": None,  # Jabatan/Posisi
+                "RegSeaServiceShipName": None,  # Nama Kapal
+                "RegSeaServiceShipType": None,  # Tipe Kapal
+                "RegSeaServiceGRT": None,  # Gross Tonnage
+                "RegSeaServiceOnBoard": None,  # Tanggal On Board
+                "RegSeaServiceOffBoard": None,  # Tanggal Off Board
+                "RegSeaServiceNote": None,  # Catatan tambahan
+                "RegSeaServiceAttachment": None,  # File Attachment
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            
+            # Logging berhasil transformasi
+            log_transform.info(f"[Transformed] Data registerSeaService baris ke-{i+1} berhasil ditransformasi.")
+            data.append(transformed_data)
+
+        except Exception as transform_error:
+            # Logging error per baris
+            log_transform.error(f"Error saat transformasi registerSeaService data baris ke-{i+1}: {transform_error}")
+
+    return data
+
+def crewing_registerTraining():
+    df = ExtractRepository.get_RegisterTraining()
+    data = []
+    
+    for i, row in df.iterrows():
+        try:
+            # Data transformasi sesuai dengan kolom di tabel Crewing_RegisterTraining
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "RegisterCrewId": row["CrewId"],
+                "RegTrainingInstitution": row["Institution"] if row["Institution"] else None,
+                "RegTrainingPosition": row["TrainingName"] if row["TrainingName"] else None,
+                "RegTrainingCategory": str(row["TrainingCategoryId"]) if row["TrainingCategoryId"] else None,
+                "RegTrainingInstructor": row["InstructorName"] if row["InstructorName"] else None,  
+                "RegTrainingFeedback": row["TrainingFeedBack"] if row["TrainingFeedBack"] else None,
+                "RegTrainingEval": row["Evaluation"] if row["Evaluation"] else None,
+                "RegTrainingStartDate": convert_to_iso(row["StartDate"]) if row["StartDate"] else None,  # Tanggal mulai training
+                "RegTrainingEndDate": convert_to_iso(row["EndDate"]) if row["EndDate"] else None,  # Tanggal selesai training
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            
+            # Logging berhasil transformasi
+            log_transform.info(f"[Transformed] Data registerTraining baris ke-{i+1} berhasil ditransformasi.")
+            data.append(transformed_data)
+
+        except Exception as transform_error:
+            # Logging error per baris
+            log_transform.error(f"Error saat transformasi registerTraining data baris ke-{i+1}: {transform_error}")
+
+    return data
+
+def crewing_registerTravelDoc():
+    df = ExtractRepository.get_RegisterCrew()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "RegisterCrewId": row["Id"],
+                "RegTravelDocName": None,
+                "RegTravelDocNo": None,
+                "RegDocDateIssued": None, 
+                "RegDocDateExpired": None,
+                "RegTravelInformation": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None, 
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data registerTraverDoc baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi registerTraverDoc data baris ke-{i+1}: {transform_error}")
+    return data
+
+def crewing_assessmentHistory():
+    # Mengambil data dari repository
+    df = ExtractRepository.get_RegisterCrew()
+    data = []
+    assesment_types = ["Screening", "BOC", "CES", "MARLIN", "Interview", "MCU", "Result", "Fail"]
+    assesment_status = ["Pending", "InProgress", "Passed", "Failed"]
+    for i, row in df.iterrows():
+        try:
+            # Data transformasi sesuai dengan kolom di tabel Crewing_AssessmentHistory
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "AssessmentType": random.choice(assesment_types), 
+                "Schedule": None,
+                "Location": None,
+                "AssessmentStatus": random.choice(assesment_status),
+                "Score": None,
+                "Note": None,
+                "BOCResultStatus": None,
+                "BOCDocument": None,
+                "ClinicName": None,
+                "ClinicLocation": None,
+                "FileId": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration", 
+                "Modified": None,  
+                "ModifiedBy": None,
+                "IsDeleted": False, 
+            }
+            
+            # Logging sukses transformasi
+            log_transform.info(f"[Transformed] Data assessmentHistory baris ke-{i + 1} berhasil ditransformasi.")
+            data.append(transformed_data)
+
+        except Exception as transform_error:
+            # Logging error per baris
+            log_transform.error(f"Error saat transformasi assessmentHistory data baris ke-{i + 1}: {transform_error}")
+
+    return data
+
+def crewing_Vessel():
+    df = ExtractRepository.get_ship()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "DivisionId": 1,
+                "ShipName": row["Name"],
+                "Id": str(uuid.uuid4()),
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data ship baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi ship data baris ke-{i+1}: {transform_error}")
+    return data
+
+
+def crewing_employee():
+    df = ExtractRepository.get_RegisterCrew()
+    df = df[df["NIP"].notna() & (df["NIP"] != "")]
+    data_cE = LogRepository.get_crewing_registerCrew()
+    data_cE = pd.DataFrame([dict(item) for item in data_cE])
+    data_cJPM = LogRepository.get_crewing_jobPositionMarine()
+    data_cJPM = pd.DataFrame([dict(item) for item in data_cJPM])
+    data = []
+    for i, row in df.iterrows():
+        try:
+            attachment_file_id = data_cE["RegPhotoId"].loc[data_cE["Id"] == row["Id"]].iloc[0] if not data_cE.loc[data_cE["Id"] == row["Id"]].empty else None
+            transformed_data = {
                 "Id": row["Id"],
-                "RegFullName": f"{row['FirstName']} {row['LastName']}".strip() if row['FirstName'] or row['LastName'] else "Unknown",
+                "FullName": " ".join(filter(None, [row.get('FirstName'), row.get('LastName')])).strip() 
+                if row.get('FirstName') or row.get('LastName') else "Unknown",
                 "Address": row["Address"] if row["Address"] else None,
                 "Email": row["Email"] if row["Email"] else None,
                 "Gender": row["Gender"] if row["Gender"] else None,
                 "PlaceOfBirth": row["BirthLoc"] if row["BirthLoc"] else None,
                 "DateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
                 "ReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
-                "Nationality": None,
-                "PhotoId": None,
+                "Nationality": "Indonesia",
+                "PhotoId": attachment_file_id,
                 "PassportPhotoId": None,
-                "KtpPhotoId": None,
+                "KtpPhotoId": attachment_file_id,
                 "IdCardNo": row["IdentityCardNo"] if row["IdentityCardNo"] else None,
                 "IdPassport": row["PasporBook"] if row["PasporBook"] else None,
                 "FamilyCardNo": row["KKNumber"] if row["KKNumber"] else None,
-                "NPWP": row["NPWP"] if row["NPWP"] else None,
+                "NPWP": row["NPWP"].replace('.', '') if row["NPWP"] else None,
                 "BPJSKesNo": row["BPJSKesNumber"] if row["BPJSKesNumber"] else None,
                 "BPJSTKNo": row["BPJSKetNumber"] if row["BPJSKetNumber"] else None,
                 "PhoneNo": str(row["CellPhone"]).strip() if pd.notnull(row["CellPhone"]) else None,
@@ -242,37 +478,367 @@ def crewing_employee():
                 "BankAccount2": row["BankAccountNo2"] if row["BankAccountNo2"] else None,
                 "BankId2": bank_id_to_uuid_mapping.get(row["BankId2"], "4ED6D9F7-9B86-401C-BD15-64315043FD0E"),
                 "BankAccountName2": row["BankAccountName2"] if row["BankAccountName2"] else None,
-                "DivisionId": row["DivisionId"],
+                "DivisionId": 1,
                 "EmployeeIdNumber": row["NIP"],
-                "OnBoardStatus": bool(row["OnBoard"]),
-                "ShipId": row["ShipId"],
+                "OnBoardStatus": True if row["RegShipStatusId"]==0 else False,
+                "ShipId": int(row["ShipId"]) + 13 if pd.notnull(row["ShipId"]) else None,
                 "MaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
-                "SeaFarerId": row["SeaManBook"],
+                "SeaFarerId": None,
                 "RegisterCrewId": row["Id"],
                 "IsResigned": False,
-                "EmploymentTypeId": employment_type_mapping.get(row["EmploymentTypeId"]),
-                "JobPositionMarineId": row["PositionId"] if row["PositionId"] in marine_position_mapping else None,
-                "JobPositionTankerId": row["PositionId"] if row["PositionId"] in tanker_position_mapping else None,
+                "EmploymentTypeId": '5E35841F-DEA8-4E72-B337-D3377E06A3BB',
+                "JobPositionMarineId": int(data_cJPM.loc[data_cJPM["Hierarchy"] == row["PositionId"], "JobPositionId"].iloc[0])
+                if not data_cJPM.loc[data_cJPM["Hierarchy"] == row["PositionId"]].empty else None,
+                "JobPositionTankerId": None,
                 "LastRejectedDate": None,
-                "WilingToAcceptLowerRank": row["WilingToAcceptLowerRank"],
-                "AvailableForm": row["AvailableForm"],
-                "AvailableUntil": row["AvailableUntil"],
-                "Weight": row["Weight"],
-                "Height": row["Height"],
-                "BMI": row["BMI"],
-                "SafetyShoesSize": row["SafetyShoesSize"],
-                "TrousersSize": row["TrousersSize"],
-                "CoverallSize": row["CoverallSize"],
-                "ShirtSize": row["ShirtSize"],
+                "WilingToAcceptLowerRank": None,
+                "AvailableForm": None,
+                "AvailableUntil": None,
+                "Weight": None,
+                "Height": None,
+                "BMI": None,
+                "SafetyShoesSize": None,
+                "TrousersSize": None,
+                "CoverallSize": None,
+                "ShirtSize": None,
                 "Created": datetime.now(),
                 "CreatedBy": "Migration",
-                "IsDeleted": row["IsDeleted"] == "Y",
-                "Modified": datetime.now(),
+                "IsDeleted": False,
+                "Modified": None,
                 "ModifiedBy": None,
-                "SeamanBookNo": row["SeaManBook"]
+                "SeamanBookNo": row["SeaManBook"] if row["SeaManBook"] else None
             }
             log_transform.info(f"[Transformed] RegisterCrew Data baris ke-{i+1}")
             data.append(transformed_data)
         except Exception as transform_error:
             log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
+    return data
+
+COCuuid_to_docName_mapping = {
+    "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42": "Endorse Ijasah",
+    "B2BD57D7-925B-4221-897C-B84E4E4DE69D": "PASPORT",
+    "169736ED-67BC-4519-9862-E4F969516F01": "SEA MAN BOOK",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849": "Ijasah",
+}
+
+def crewing_employeeCOCDoc():
+    df = ExtractRepository.get_registerDoc()
+    df_cE = LogRepository.get_crewing_employee()
+    df_cE = pd.DataFrame([dict(item) for item in df_cE])
+    data = []
+    for i, row in df.iterrows():
+        try:
+            COCName = COCuuid_to_docName_mapping.get(row["DocId"], None)
+            if not COCName:
+                continue
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["CrewId"], 
+                "COCName": COCName,
+                "COCNumber": row["Nomor"] if row["Nomor"] else None,
+                "COCId": None,
+                "COCPublishedDate": convert_to_iso(row["Issued"]) if row["Issued"] else None,  
+                "COCExpiryDate": convert_to_iso(row["Expired"]) if row["Expired"] else None,  
+                "COCDescription": row["Description"] if row["Description"] else None, 
+                "COCAttachment": None, 
+                "Created": datetime.now(),  
+                "CreatedBy": "Migration",  
+                "Modified": None,  
+                "ModifiedBy": None,  
+                "IsDeleted": False  
+            }
+            log_transform.info(f"[Transformed] Data employeeCOCDoc baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi employeeCOCDoc data baris ke-{i+1}: {transform_error}")
+
+    return data
+
+COPuuid_to_docName_mapping = {
+    "B80D3BD7-34F5-4BAA-84AF-0C1FF272A02B": "MC",
+    "6353E8E2-6063-49E3-AED4-0D8C5B786ABA": "BOCT",
+    "EA866E65-0B62-4622-91C5-0E13E4CDC660": "RADAR",
+    "F9B89D2B-7753-4917-85B7-0F1C45BB5CC1": "KONDITE",
+    "72C621FC-4ED9-4CCF-BE1F-0FA161C5B317": "ORU",
+    "E40434B3-A5AD-4A0B-9F6D-12E37C1BC752": "Marlin Test",
+    "C5D2F351-7792-4266-A3A0-136AF4DB0C52": "BST",
+    "E7572546-BD95-4E95-85B9-1F44A202F93C": "ARPA",
+    "47CA7D1A-201F-42EA-B75C-1FB95E1CACF4": "CV",
+    "5EF1B87F-8B21-44D8-8140-23787CF72136": "AOT",
+    "8FB09090-84B4-4681-934A-2951BDF4E956": "MCU",
+    "16D9F5F9-B205-4DAA-A005-30335742D366": "ACT",
+    "5B72E1B7-0AED-4DD0-80F2-34EEC5200075": "LeaderShip & TeamWork",
+    "5E2E3754-0B1A-434B-9260-3765DCC77932": "SSO",
+    "8FBBF102-FE02-4300-B551-3AAE52D72417": "RAGGER",
+    "9152179F-120D-4153-B4D7-3C33B28AEC25": "AFF",
+    "95020C92-C922-44FF-82EF-47CC21207058": "MFA",
+    "AF74F4BC-0DE7-446F-8597-47F9AE37C1E3": "SCRB",
+    "E895635D-DE1F-450B-8802-565F993DE9E8": "FRC",
+    "7ED3D551-2332-40F2-9BE5-6C8F846D1B62": "CTSTP",
+    "07FCD3DC-3FDB-44E7-96A1-778C95273EF8": "ERM",
+    "A4BEBC3F-2EDE-47D2-B3D8-98CEC75F7BFE": "GMDSS",
+    "89384A94-B3D8-4FAE-8EE6-A6FF7095DF69": "SDSD & SAT",
+    "481F87FA-3231-4338-BC9C-B2314ED799D1": "ECDIS",
+    "3D175A25-51DD-4017-97C3-BCD09464547A": "BRM",
+    "17DDBD73-5DC1-44E7-8206-BEDD6E6EA9DF": "Approval BOC Pertamina",
+    "84E7E966-16A9-4124-A58C-D8F60FD2AD6D": "SBSOT",
+    "E0B19778-03DD-4ADB-9AFC-E94F09F87085": "ALGT",
+    "BEF454D7-C17D-4C1C-AC60-F00AA0EAB55B": "BLGT",
+}
+
+def crewing_employeeCOPDoc():
+    df = ExtractRepository.get_registerDoc() 
+    df_cE = LogRepository.get_crewing_employee()
+    df_cE = pd.DataFrame([dict(item) for item in df_cE])
+    data = []
+    for i, row in df.iterrows():
+        try:
+            COPName = COPuuid_to_docName_mapping.get(row["DocId"], None)
+            if not COPName:
+                continue
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["CrewId"],
+                "COPName": COPName,
+                "COPNumber": row["Nomor"] if row["Nomor"] else None,
+                "COPId": None,
+                "COPPublishedDate": convert_to_iso(row["Issued"]) if row["Issued"] else None,  
+                "COPExpiryDate": convert_to_iso(row["Expired"]) if row["Expired"] else None,  
+                "COPDescription": row["Description"] if row["Description"] else None, 
+                "COPAttachment": None, 
+                "Created": datetime.now(),  
+                "CreatedBy": "Migration",  
+                "Modified": None,  
+                "ModifiedBy": None,  
+                "IsDeleted": False  
+            }
+            log_transform.info(f"[Transformed] Data employeeCOPDoc baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi employeeCOPDoc data baris ke-{i+1}: {transform_error}")
+
+    return data
+
+def crewing_employeeEducation():
+    log_transform = logging.getLogger("Log Transform Education")
+
+    df = ExtractRepository.get_Education()
+    city = ExtractRepository.get_City()
+
+    city_lookup = {row["Id"]: row["Name"] for _, row in city.iterrows()}
+
+    # Buat list data
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],  # ID unik
+                "EmployeeId": row["CrewID"] if row["CrewID"] else None,  # ID karyawan
+                "EduSchool": row["SchoolName"] if row["SchoolName"] else None,  # Nama sekolah
+                "EduDegree": row["Degree"] if row["Degree"] else None,  # Gelar pendidikan
+                "EduMajor": None if pd.isnull(row["Prodi"]) else row["Prodi"],  # Jurusan
+                "EduGPA": row["Score"] if row["Score"] else None,  # IPK
+                "EduYearAdmission": convert_to_int(row["EntryYear"]),  # Tahun masuk
+                "EduYearGraduate": convert_to_int(row["LeaveYear"]),  # Tahun lulus
+                "EduCity": city_lookup.get(row["City"], "Unknown"),  # Lookup nama kota atau default
+                "Created": datetime.now(),  # Timestamp saat data dibuat
+                "CreatedBy": "Migration",  # Informasi migrasi
+                "IsDeleted": isDeleted_mapping.get(row["IsDeleted"], False),  # Status penghapusan
+                "Modified": datetime.now(),  # Timestamp modifikasi
+                "ModifiedBy": None  # Belum ada perubahan manual
+            }
+            log_transform.info(f"[Transformed] Data Crewing_EmployeeEducation baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi Crewing_EmployeeEducation data baris ke-{i+1}: {transform_error}")
+    return data
+
+def crewing_employeeFamily():
+    df = ExtractRepository.get_RegisterCrew()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["Id"],
+                "Relationship": None,
+                "Fullname": None,
+                "Gender": None,
+                "DateOfBirth": None,
+                "MobileNo": None,
+                "Email": None,
+                "KtpNumber": None,
+                "FamilyRegisterNumber": None,
+                "Address": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data registerFamily baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi registerFamily data baris ke-{i+1}: {transform_error}")
+    return data
+
+def crewing_employeeMedicalCertificate():
+        # Fetching data from repositories
+        df = ExtractRepository.get_RegisterCrew()
+        data_cE = LogRepository.get_crewing_registerCrew()
+        data_cE = pd.DataFrame([dict(item) for item in data_cE])  # Convert to DataFrame
+
+        data = []
+        for i, row in df.iterrows():
+            try:
+                # Filter to find the corresponding RegPhotoId
+                attachment_file_id = data_cE.loc[data_cE["Id"] == row["Id"], "RegPhotoId"].iloc[0] if not data_cE.loc[data_cE["Id"] == row["Id"]].empty else None
+                
+                # Prepare transformed data
+                transformed_data = {
+                    "Id": str(uuid.uuid4()),
+                    "EmployeeId": row["Id"],
+                    "MedicalCertificateName": "MCU",
+                    "Number": None,
+                    "PlaceOfIssue": None,
+                    "DateOfIssue": None,
+                    "ExpirationDate": None,
+                    "AttachmentFileId": attachment_file_id,
+                    "Created": datetime.now(),
+                    "CreatedBy": "Migration",
+                    "Modified": None,
+                    "ModifiedBy": None,
+                    "IsDeleted": False
+                }
+                
+                log_transform.info(f"[Transformed] Data registerMedicalCertificate row {i + 1} transformed successfully.")
+                data.append(transformed_data)
+
+            except Exception as transform_error:
+                log_transform.error(f"Error transforming row {i + 1}: {transform_error}")
+
+        return data
+
+def crewing_employeeSeaService():
+    # Mengambil data dari repository
+    df = ExtractRepository.get_registerExperience()
+    data = []
+    
+    for i, row in df.iterrows():
+        try:
+            # Data transformasi sesuai dengan kolom di tabel Crewing_RegisterSeaService
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["CrewId"],
+                "SeaServiceCompanyName": None if pd.isna(row["Company"]) else row["Company"],
+                "SeaServicePosition": None if pd.isna(row["Position"]) else row["Position"], 
+                "SeaServiceShipName": None if pd.isna(row["Ship"]) else row["Ship"],
+                "SeaServiceShipType": None if pd.isna(row["ShipType"]) else row["ShipType"],
+                "SeaServiceGRT": None if pd.isna(row["Grt"]) else row["Grt"],
+                "SeaServiceOnBoard": convert_to_iso(row["WorkStart"]) if row["WorkStart"] else None,
+                "SeaServiceOffBoard": convert_to_iso(row["WorkEnd"]) if row["WorkEnd"] else None,
+                "SeaServiceNote": None if pd.isna(row["Description"]) else row["Description"],
+                "SeaServiceAttachment": None,
+                "VesselId": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False,
+                "SeaServiceDWT": None,
+                "SeaServiceHP": None,
+            }
+            
+            # Logging berhasil transformasi
+            log_transform.info(f"[Transformed] Data registerSeaService baris ke-{i+1} berhasil ditransformasi.")
+            data.append(transformed_data)
+
+        except Exception as transform_error:
+            # Logging error per baris
+            log_transform.error(f"Error saat transformasi registerSeaService data baris ke-{i+1}: {transform_error}")
+
+    return data
+
+def crewing_ship():
+    df = ExtractRepository.get_shipCategory()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "ShipId": row["Id"],
+                "DivisionId": 1,
+                "ShipName": row["Name"],
+                "Id": str(uuid.uuid4()),
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data ship baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi ship data baris ke-{i+1}: {transform_error}")
+    return data
+
+def crewing_employeeTraining():
+    df = ExtractRepository.get_RegisterTraining()
+    data = []
+    
+    for i, row in df.iterrows():
+        try:
+            # Data transformasi sesuai dengan kolom di tabel Crewing_RegisterTraining
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["CrewId"].lower(),
+                "TrainingInstitution": row["Institution"] if row["Institution"] else None,
+                "TrainingPosition": row["TrainingName"] if row["TrainingName"] else None,
+                "TrainingCategory": str(row["TrainingCategoryId"]) if row["TrainingCategoryId"] else None,
+                "TrainingInstructor": None if pd.isna(row["InstructorName"]) else row["InstructorName"],  
+                "TrainingFeedback": None if pd.isna(row["TrainingFeedBack"]) else row["TrainingFeedBack"],
+                "TrainingEval": None if pd.isna(row["Evaluation"]) else row["Evaluation"],
+                "TrainingStartDate": convert_to_iso(row["StartDate"]) if row["StartDate"] else None,  # Tanggal mulai training
+                "TrainingEndDate": convert_to_iso(row["EndDate"]) if row["EndDate"] else None,  # Tanggal selesai training
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            
+            # Logging berhasil transformasi
+            log_transform.info(f"[Transformed] Data Training baris ke-{i+1} berhasil ditransformasi.")
+            data.append(transformed_data)
+
+        except Exception as transform_error:
+            # Logging error per baris
+            log_transform.error(f"Error saat transformasi Training data baris ke-{i+1}: {transform_error}")
+
+    return data
+
+def crewing_employeeTravelDoc():
+    df = LogRepository.get_crewing_employeeCOCDoc()
+    df = pd.DataFrame([dict(item) for item in df])
+    df = df[df["COCName"].isin(['PASPORT', 'SEA MAN BOOK'])]
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["EmployeeId"],
+                "TravelDocName": None if pd.isna(row["COCName"]) else row["COCName"],
+                "TravelDocNo": None if pd.isna(row["COCNumber"]) else row["COCNumber"],
+                "DocDateIssued": None if pd.isna(row["COCPublishedDate"]) else row["COCPublishedDate"], 
+                "DocDateExpired": None if pd.isna(row["COCExpiryDate"]) else row["COCExpiryDate"],
+                "TravelInformation": None if pd.isna(row["COCDescription"]) else row["COCDescription"],
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None, 
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data TravelDoc baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi TravelDoc data baris ke-{i+1}: {transform_error}")
     return data
