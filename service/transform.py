@@ -655,6 +655,7 @@ def crewing_employeeEducation():
 
 def crewing_employeeFamily():
     df = ExtractRepository.get_RegisterCrew()
+    df = df[df["NIP"].notna() & (df["NIP"] != "")]
     data = []
     for i, row in df.iterrows():
         try:
@@ -662,7 +663,7 @@ def crewing_employeeFamily():
                 "Id": str(uuid.uuid4()),
                 "EmployeeId": row["Id"],
                 "Relationship": None,
-                "Fullname": None,
+                "Fullname": None if pd.isna(row["HomePhone"]) else row["HomePhone"],
                 "Gender": None,
                 "DateOfBirth": None,
                 "MobileNo": None,
