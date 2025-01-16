@@ -60,3 +60,15 @@ class ExtractRepository:
         file_path = os.getenv("SHIPCATEGORY_FILE_PATH", "./data_source/CorePTKDb.ShipCategory.csv")
         data = pd.read_csv(file_path)
         return data
+    
+    @staticmethod
+    def get_registerCrew_mapShipCategory():
+        file_path = os.getenv("REGISTERCREW_MAPSHIPCATEGORY_FILE_PATH", "./data_source/RegisterCrew_map_shipcategory.csv")
+        data = pd.read_csv(file_path)
+        return data
+    
+    @staticmethod
+    def get_mappingShipToVessel():
+        file_path = os.getenv("MAPPINGSIPTOVESS_FILE_PATH", "./data_source/updated_ship_data.csv")
+        data = pd.read_csv(file_path)
+        return data

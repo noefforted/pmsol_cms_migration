@@ -42,3 +42,27 @@ class LogRepository:
         prisma.disconnect()
         return data
     
+    @staticmethod
+    def get_crewing_vessel():
+        prisma = Prisma()
+        prisma.connect()
+        data = prisma.crewing_vessel.find_many()
+        prisma.disconnect()
+        return data
+    
+    @staticmethod
+    def get_crewing_ship():
+        prisma = Prisma()
+        prisma.connect()
+        data = prisma.crewing_ship.find_many()
+        prisma.disconnect()
+        return data
+    
+    @staticmethod
+    def get_crewing_employeeSeaService():
+        prisma = Prisma()
+        prisma.connect()
+        data = prisma.crewing_employeeseaservice.find_many()
+        prisma.disconnect()
+        return data
+    

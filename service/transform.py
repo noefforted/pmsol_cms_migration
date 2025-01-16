@@ -443,9 +443,15 @@ def crewing_employee():
     data_cE = pd.DataFrame([dict(item) for item in data_cE])
     data_cJPM = LogRepository.get_crewing_jobPositionMarine()
     data_cJPM = pd.DataFrame([dict(item) for item in data_cJPM])
+    data_regDoc = ExtractRepository.get_registerDoc()
     data = []
     for i, row in df.iterrows():
         try:
+            matching_doc = data_regDoc[
+                (data_regDoc["CrewId"] == row["Id"]) &
+                (data_regDoc["DocId"] != "169736ED-67BC-4519-9862-E4F969516F01") &
+                (data_regDoc["Nomor"].str.startswith("62"))
+            ]
             attachment_file_id = data_cE["RegPhotoId"].loc[data_cE["Id"] == row["Id"]].iloc[0] if not data_cE.loc[data_cE["Id"] == row["Id"]].empty else None
             transformed_data = {
                 "Id": row["Id"],
@@ -453,7 +459,7 @@ def crewing_employee():
                 if row.get('FirstName') or row.get('LastName') else "Unknown",
                 "Address": row["Address"] if row["Address"] else None,
                 "Email": row["Email"] if row["Email"] else None,
-                "Gender": row["Gender"] if row["Gender"] else None,
+                "Gender": "Male" if row["Gender"] == "M" else "Female" if row["Gender"] == "F" else None,
                 "PlaceOfBirth": row["BirthLoc"] if row["BirthLoc"] else None,
                 "DateOfBirth": convert_to_iso(row["BirthDate"]) if row["BirthDate"] else None,
                 "ReligionId": religion_id_to_uuid_mapping.get(row["ReligionId"], "6CB2019D-2B83-40C9-A8BC-5C25102309B5"),
@@ -481,9 +487,9 @@ def crewing_employee():
                 "DivisionId": 1,
                 "EmployeeIdNumber": row["NIP"],
                 "OnBoardStatus": True if row["RegShipStatusId"]==0 else False,
-                "ShipId": int(row["ShipId"]) + 13 if pd.notnull(row["ShipId"]) else None,
+                "ShipId": None,
                 "MaritalStatusId": marital_status_id_to_uuid_mapping.get(row["MaritalStatusId"], "6EEBD3CE-9FAD-4566-ABD9-197416643170"),
-                "SeaFarerId": None,
+                "SeaFarerId": matching_doc["Nomor"].iloc[0][:10] if not matching_doc.empty else None,
                 "RegisterCrewId": row["Id"],
                 "IsResigned": False,
                 "EmploymentTypeId": '5E35841F-DEA8-4E72-B337-D3377E06A3BB',
@@ -516,15 +522,35 @@ def crewing_employee():
 
 COCuuid_to_docName_mapping = {
     "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42": "Endorse Ijasah",
-    "B2BD57D7-925B-4221-897C-B84E4E4DE69D": "PASPORT",
-    "169736ED-67BC-4519-9862-E4F969516F01": "SEA MAN BOOK",
     "A80303C3-56E5-4463-96C6-F46B62D1F849": "Ijasah",
+}
+
+COCDocId_to_specificCOCIDid_mapping = {
+    "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42": 17,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849CCD231DF-51D6-4F57-B9A4-E7AC91DAE096": 14,
+    "A80303C3-56E5-4463-96C6-F46B62D1F84914E1BD41-BF82-4BEF-9102-7558FF91EFF0": 1,
+    "A80303C3-56E5-4463-96C6-F46B62D1F8495200306F-B1AC-4DEB-92BE-D2EE3273C34B": 2,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849E479D469-C902-4944-815F-78F443B8AD2F": 3,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849BC36EF55-61B7-46D2-9149-2EBE416907DE": 5,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849DEC6B749-F9DA-47CC-8E3C-37EFCC01E0B4": 6,
+    "A80303C3-56E5-4463-96C6-F46B62D1F84946926539-9F5D-4040-ACF4-025FC066C2F3": 15,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849B1D8F01F-AD1C-4451-BCF9-31641B5D8621": 7,
+    "A80303C3-56E5-4463-96C6-F46B62D1F8491241A596-2A01-4DFB-B3E2-E12434752944": 8,
+    "A80303C3-56E5-4463-96C6-F46B62D1F8490BD4BAAB-C009-44F4-8267-E8DCE4F4D381": 9,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849CE4C72A8-0391-4E5A-8F44-135C3B6A5F69": 10,
+    "A80303C3-56E5-4463-96C6-F46B62D1F8493BAD689A-3B60-46FA-BE2E-3D09AF6EA892": 11,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849A912D717-24F2-4B69-AB98-BAA2778E8022": 14,
+    "A80303C3-56E5-4463-96C6-F46B62D1F849C545718B-8001-43F2-BF41-6DDFD246BB0C": 15
 }
 
 def crewing_employeeCOCDoc():
     df = ExtractRepository.get_registerDoc()
+    df = df[df["DocId"].isin(['DD9AB9B9-E4F7-4174-80A2-3CC04D961A42', 'A80303C3-56E5-4463-96C6-F46B62D1F849'])]
     df_cE = LogRepository.get_crewing_employee()
     df_cE = pd.DataFrame([dict(item) for item in df_cE])
+    df['CrewId'] = df['CrewId'].astype(str).str.lower()
+    df = df[(df['CrewId']).isin(df_cE['Id'])]
+    # print(df)
     data = []
     for i, row in df.iterrows():
         try:
@@ -536,7 +562,7 @@ def crewing_employeeCOCDoc():
                 "EmployeeId": row["CrewId"], 
                 "COCName": COCName,
                 "COCNumber": row["Nomor"] if row["Nomor"] else None,
-                "COCId": None,
+                "COCId": COCDocId_to_specificCOCIDid_mapping.get(f"{row['DocId']}{row['IjasahId'] or ''}", None),
                 "COCPublishedDate": convert_to_iso(row["Issued"]) if row["Issued"] else None,  
                 "COCExpiryDate": convert_to_iso(row["Expired"]) if row["Expired"] else None,  
                 "COCDescription": row["Description"] if row["Description"] else None, 
@@ -547,6 +573,7 @@ def crewing_employeeCOCDoc():
                 "ModifiedBy": None,  
                 "IsDeleted": False  
             }
+            # print(f"COCId = {transformed_data["COCId"]}")
             log_transform.info(f"[Transformed] Data employeeCOCDoc baris ke-{i+1}")
             data.append(transformed_data)
         except Exception as transform_error:
@@ -723,6 +750,7 @@ def crewing_employeeMedicalCertificate():
 def crewing_employeeSeaService():
     # Mengambil data dari repository
     df = ExtractRepository.get_registerExperience()
+    df2 = ExtractRepository.get_mappingShipToVessel()
     data = []
     
     for i, row in df.iterrows():
@@ -740,7 +768,7 @@ def crewing_employeeSeaService():
                 "SeaServiceOffBoard": convert_to_iso(row["WorkEnd"]) if row["WorkEnd"] else None,
                 "SeaServiceNote": None if pd.isna(row["Description"]) else row["Description"],
                 "SeaServiceAttachment": None,
-                "VesselId": None,
+                "VesselId": df2.loc[df2["ShipName"] == row["Ship"], "VesselId"].iloc[0] if not df2.loc[df2["ShipName"] == row["Ship"]].empty else None,
                 "Created": datetime.now(),
                 "CreatedBy": "Migration",
                 "Modified": None,
@@ -760,27 +788,6 @@ def crewing_employeeSeaService():
 
     return data
 
-def crewing_ship():
-    df = ExtractRepository.get_shipCategory()
-    data = []
-    for i, row in df.iterrows():
-        try:
-            transformed_data = {
-                "ShipId": row["Id"],
-                "DivisionId": 1,
-                "ShipName": row["Name"],
-                "Id": str(uuid.uuid4()),
-                "Created": datetime.now(),
-                "CreatedBy": "Migration",
-                "Modified": None,
-                "ModifiedBy": None,
-                "IsDeleted": False
-            }
-            log_transform.info(f"[Transformed] Data ship baris ke-{i+1}")
-            data.append(transformed_data)
-        except Exception as transform_error:
-            log_transform.error(f"Error saat transformasi ship data baris ke-{i+1}: {transform_error}")
-    return data
 
 def crewing_employeeTraining():
     df = ExtractRepository.get_RegisterTraining()
@@ -817,6 +824,10 @@ def crewing_employeeTraining():
 
     return data
 
+traverDocuuid_to_docName_mapping = {
+    "B2BD57D7-925B-4221-897C-B84E4E4DE69D": "PASPORT",
+    "169736ED-67BC-4519-9862-E4F969516F01": "SEA MAN BOOK",
+}
 def crewing_employeeTravelDoc():
     df = LogRepository.get_crewing_employeeCOCDoc()
     df = pd.DataFrame([dict(item) for item in df])
@@ -842,4 +853,103 @@ def crewing_employeeTravelDoc():
             data.append(transformed_data)
         except Exception as transform_error:
             log_transform.error(f"Error saat transformasi TravelDoc data baris ke-{i+1}: {transform_error}")
+    return data
+
+def update_employeeShipId():
+    # Ambil data dari repository
+    df = ExtractRepository.get_registerCrew_mapShipCategory()
+    df_ship = LogRepository.get_crewing_ship()
+    df_ship = pd.DataFrame([dict(item) for item in df_ship])
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],
+                "ShipId": int(df_ship.loc[df_ship["ShipName"] == row["CATEGORY"], "ShipId"].iloc[0] 
+                if not df_ship.loc[df_ship["ShipName"] == row["CATEGORY"], "ShipId"].empty else None)
+            }
+            log_transform.info(f"[Transformed] Data RegisterCrew baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
+    return data
+
+blacklistuuid_to_int_mapping = {
+    "B64941C1-47F0-4084-8890-85F4694387F0": 1,
+    "97F89829-AD8D-4C7C-9B44-1A6F9C6733CC": 2,
+    "8E167EFA-FBC3-49B6-BF87-7DC30FEE6E78": 4,
+}
+
+def crewing_employeeBlacklist():
+    df = ExtractRepository.get_RegisterCrew()
+    df = df[
+    (df["StatusRegister"] == "B64941C1-47F0-4084-8890-85F4694387F0") |
+    (df["StatusRegister"] == "97F89829-AD8D-4C7C-9B44-1A6F9C6733CC") |
+    (df["StatusRegister"] == "8E167EFA-FBC3-49B6-BF87-7DC30FEE6E78")]
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["Id"],
+                "EmployeeBlacklistLevelId": blacklistuuid_to_int_mapping.get(row["StatusRegister"]),
+                "StartDate": None,
+                "EndDate": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False
+            }
+            log_transform.info(f"[Transformed] Data Blacklist baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi Blacklist data baris ke-{i+1}: {transform_error}")
+    return data
+
+activeStatusuuid_to_bool_mapping = {
+    "027C7105-0F55-44F1-A286-492BB8DDB8D8": True,
+    "6A422334-62D7-46CA-A07B-167E15690627": False,
+}
+
+def crewing_employeeBoardSchedule():
+    # Mengambil data dari repository
+    df = ExtractRepository.get_RegisterCrew()
+    df = df[df["NIP"].notna() & (df["NIP"] != "")]
+    df = df[
+        (df["StatusRegister"] == "027C7105-0F55-44F1-A286-492BB8DDB8D8") |
+        (df["StatusRegister"] == "6A422334-62D7-46CA-A07B-167E15690627") ]
+    df2 = ExtractRepository.get_mappingShipToVessel()
+    data_cJPM = LogRepository.get_crewing_jobPositionMarine()
+    data_cJPM = pd.DataFrame([dict(item) for item in data_cJPM])
+    data = []
+    for i, row in df.iterrows():
+        try:
+            # Membuat transformed_data
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": row["Id"],
+                "OnBoardDate": convert_to_iso(row["OnBoard"]) if row["OnBoard"] else None,
+                "OffBoardDate": convert_to_iso(row["OffBoard"]) if row["OffBoard"] else None,
+                "IsActive": activeStatusuuid_to_bool_mapping.get(row["StatusRegister"]),
+                "VesselId": df2.loc[df2["ShipId"] == row["ShipId"], "VesselId"].iloc[0] if not df2.loc[df2["ShipId"] == row["ShipId"]].empty else None,
+                "JobPositionMarineId": int(data_cJPM.loc[data_cJPM["Hierarchy"] == row["PositionId"], "JobPositionId"].iloc[0])
+                if not data_cJPM.loc[data_cJPM["Hierarchy"] == row["PositionId"]].empty else None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False,
+                "IsOnBoard": True if row["RegShipStatusId"] == 0 else False,
+                "OriginalOffBoardDate": None,
+            }
+
+            if transformed_data["VesselId"] is not None and pd.notna(transformed_data["VesselId"]):
+                log_transform.info(f"[Transformed] Data BoardSchedule baris ke-{i+1}")
+                data.append(transformed_data)
+            else:
+                log_transform.warning(f"Data baris ke-{i+1} di-skip karena VesselId None atau nan")
+
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi BoardSchedule data baris ke-{i+1}: {transform_error}")
     return data

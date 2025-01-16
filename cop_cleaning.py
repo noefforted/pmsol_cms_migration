@@ -1,0 +1,4 @@
+import cop_file_migrate, delete_mcu_in_cop
+
+cop_file_migrate.a_copy_files_based_on_employee_and_userdoc()
+delete_mcu_in_cop.b_delete_files_based_on_employee_and_userdoc()

@@ -1,12 +1,12 @@
 from prisma import Prisma
-
-def coba():
+import pandas as pd
+def get_crewing_employeeSeaService():
     prisma = Prisma()
     prisma.connect()
+    data = prisma.crewing_employeeseaservice.find_many()
+    df = pd.DataFrame([dict(item) for item in data])
+    df = 
+    prisma.disconnect()
+    print(data)
 
-    data = prisma.crewing_employeecocdoc.find_many()
-    for item in data:
-        print(item)
-
-
-coba()
+get_crewing_employeeSeaService()

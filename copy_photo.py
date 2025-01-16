@@ -15,10 +15,6 @@ def copy_photo():
         data = prisma.crewing_registercrew.find_many()
         df2 = pd.DataFrame([dict(item) for item in data])
 
-        # Debug: Periksa kolom yang tersedia
-        # print("DF1 Columns:", df1.columns)
-        # print("DF2 Columns:", df2.columns)
-
         # Konversi kolom Id ke string dan normalkan ke huruf kecil
         df1['Id'] = df1['Id'].astype(str).str.lower().str.strip()
         df2['Id'] = df2['Id'].astype(str).str.lower().str.strip()
@@ -34,7 +30,6 @@ def copy_photo():
             if not row1['Foto'] or pd.isna(file_path):
                 print(f"Skipping row with empty Foto for Id: {row1['Id']}")
                 continue
-            # print(f"File Path: {file_path}")
 
             # Filter baris di df2 dengan Id yang sama
             matching_rows = df2[df2['Id'] == row1['Id']]
@@ -47,14 +42,17 @@ def copy_photo():
             row2 = matching_rows.iloc[0]
             
             # Ambil informasi folder tujuan
-            destination_base = "/media/ahmadaufa/J Gab/SuperApp_Files/personaldata"
+            destination_base = "/media/ahmadaufa/J Gab/SuperApp_Files_Fix/personaldata"
             destination_folder = os.path.join(destination_base, row2['RegPhotoId'])
-            destination_path = os.path.join(destination_folder, os.path.basename(file_path))
             
-            # Pastikan folder tujuan ada
+            # Jika folder tujuan tidak ada, skip
             if not os.path.exists(destination_folder):
-                os.makedirs(destination_folder)
+                print(f"Destination folder does not exist. Skipping: {destination_folder}")
+                continue
             
+            # Lokasi tujuan file
+            destination_path = os.path.join(destination_folder, os.path.basename(file_path))
+
             # Copy file ke folder tujuan
             try:
                 shutil.copy(file_path, destination_path)

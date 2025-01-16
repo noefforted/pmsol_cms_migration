@@ -244,11 +244,15 @@ class Migrate:
     #     prisma.connect()
     #     try:
     #         final_data = service.transform.crewing_employee()
-    #         prisma.crewing_employee.delete_many()
-    #         for index, row in enumerate(final_data, start>=1):
+    #         # prisma.crewing_employee.delete_many()
+    #         for index, row in enumerate(final_data, start=1):
     #             try:
-    #                 prisma.crewing_employee.create(data=row)
-    #                 log_migrate.info(f"[Created] Data Employee baris ke-{index}")
+    #                 # prisma.crewing_employee.create(data=row)
+    #                 prisma.crewing_employee.update(
+    #                     where={"Id": row["Id"]},
+    #                     data={"Gender": row["Gender"], "SeaFarerId": row["SeaFarerId"]}
+    #                 )
+    #                 log_migrate.info(f"[Updated] Data Employee baris ke-{index}")
     #             except Exception as item_error:
     #                 log_migrate.error(f"Error saat membuat data Employee: {item_error} | Data: {row}")
     #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee")
@@ -267,9 +271,11 @@ class Migrate:
     #         prisma.crewing_employeecocdoc.delete_many()
     #         for index, row in enumerate(final_data, start=1):
     #             try:
+    #                 # print(row)
     #                 prisma.crewing_employeecocdoc.create(data=row)
     #                 log_migrate.info(f"[Created] Data Employee COC Doc baris ke-{index}")
-    #             except Exception:
+    #             except Exception as e:
+    #                 log_migrate.error(f"Error saat membuat data Employee COC Doc: {e}")
     #                 continue
     #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee COC Doc")
     #     except Exception as e:
@@ -317,25 +323,25 @@ class Migrate:
     #     finally:
     #         prisma.disconnect()
 
-    @staticmethod
-    @priority(16)
-    def crewing_employeeFamily():
-        prisma = Prisma()
-        prisma.connect()
-        try:
-            final_data = service.transform.crewing_employeeFamily()
-            prisma.crewing_employeefamily.delete_many()
-            for index, row in enumerate(final_data, start=1):
-                try:
-                    prisma.crewing_employeefamily.create(data=row)
-                    log_migrate.info(f"[Created] Data Employee Family baris ke-{index}")
-                except Exception as item_error:
-                    log_migrate.error(f"Error saat membuat data Employee Family: {item_error} | Data: {row}")
-            log_migrate.info(f"[Migrated] {len(final_data)} Data Employee Family")
-        except Exception as e:
-            log_migrate.error(f"Error saat memasukkan data Employee Family: {e}")
-        finally:
-            prisma.disconnect()
+    # @staticmethod
+    # @priority(16)
+    # def crewing_employeeFamily():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.crewing_employeeFamily()
+    #         prisma.crewing_employeefamily.delete_many()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employeefamily.create(data=row)
+    #                 log_migrate.info(f"[Created] Data Employee Family baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat membuat data Employee Family: {item_error} | Data: {row}")
+    #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee Family")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memasukkan data Employee Family: {e}")
+    #     finally:
+    #         prisma.disconnect()
 
     # @staticmethod
     # @priority(17) 
@@ -354,26 +360,6 @@ class Migrate:
     #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee Medical Certificate")
     #     except Exception as e:
     #         log_migrate.error(f"Error saat memasukkan data Employee Medical Certificate: {e}")
-    #     finally:
-    #         prisma.disconnect()
-
-    # @staticmethod
-    # @priority(18)
-    # def crewing_ship():
-    #     prisma = Prisma()
-    #     prisma.connect()
-    #     try:
-    #         final_data = service.transform.crewing_ship()
-    #         prisma.crewing_ship.delete_many()
-    #         for index, row in enumerate(final_data, start=1):
-    #             try:
-    #                 prisma.crewing_ship.create(data=row)
-    #                 log_migrate.info(f"[Created] Data ship baris ke-{index}")
-    #             except Exception as item_error:
-    #                 log_migrate.error(f"Error saat membuat data ship: {item_error} | Data: {row}")
-    #         log_migrate.info(f"[Migrated] {len(final_data)} Data ship")
-    #     except Exception as e:
-    #         log_migrate.error(f"Error saat memasukkan data ship: {e}")
     #     finally:
     #         prisma.disconnect()
 
@@ -452,6 +438,67 @@ class Migrate:
     #     finally:
     #         prisma.disconnect()
 
+    @staticmethod
+    @priority(22)
+    def update_employeeShipId():
+        prisma = Prisma()
+        prisma.connect()
+        try:
+            final_data = service.transform.update_employeeShipId()
+            for index, row in enumerate(final_data, start=1):
+                try:
+                    prisma.crewing_employee.update(
+                        where={"Id": row["Id"]},  # Gunakan kunci unik dari tabel Anda
+                        data={"ShipId": row["ShipId"]}  # Data yang diperbarui
+                    )
+                    log_migrate.info(f"[Updated] Data Employee ShipId baris ke-{index}")
+                except Exception as item_error:
+                    log_migrate.error(f"Error saat memperbarui data Employee ShipId: {item_error} | Data: {row}")
+        except Exception as e:
+            log_migrate.error(f"Error saat memperbarui data Employee ShipId: {e}")
+        finally:
+            prisma.disconnect()
+
+    # @staticmethod
+    # @priority(23)
+    # def crewing_employeeBlacklist():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.crewing_employeeBlacklist()
+    #         # print(f"Final Data: {final_data}")
+    #         prisma.crewing_employeeblacklist.delete_many()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employeeblacklist.create(data=row)
+    #                 log_migrate.info(f"[Created] Data Employee Blacklist baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat membuat data Employee Blacklist: {item_error} | Data: {row}")
+    #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee Blacklist")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memasukkan data Employee Blacklist: {e}")
+    #     finally:
+    #         prisma.disconnect()
+    
+    # @staticmethod
+    # @priority(24)
+    # def crewing_employeeBoardSchedule():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.crewing_employeeBoardSchedule()
+    #         prisma.crewing_employeeboardschedule.delete_many()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employeeboardschedule.create(data=row)
+    #                 log_migrate.info(f"[Created] Data Employee Board Schedule baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat membuat data Employee Board Schedule: {item_error} | Data: {row}")
+    #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee Board Schedule")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memasukkan data Employee Board Schedule: {e}")
+    #     finally:
+    #         prisma.disconnect()
 
 log_create = logging.getLogger("Log Create")
 class Create:
