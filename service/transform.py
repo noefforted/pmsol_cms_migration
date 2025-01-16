@@ -473,7 +473,7 @@ def crewing_employee():
                 "NPWP": row["NPWP"].replace('.', '') if row["NPWP"] else None,
                 "BPJSKesNo": row["BPJSKesNumber"] if row["BPJSKesNumber"] else None,
                 "BPJSTKNo": row["BPJSKetNumber"] if row["BPJSKetNumber"] else None,
-                "PhoneNo": str(row["CellPhone"]).strip() if pd.notnull(row["CellPhone"]) else None,
+                "PhoneNo": str(row["CellPhone"]).replace('.0', '') if row["CellPhone"] else None,
                 "RelativesName": None,
                 "RelativesEmail": None,
                 "RelativesPhone": None,
@@ -525,7 +525,7 @@ COCuuid_to_docName_mapping = {
     "A80303C3-56E5-4463-96C6-F46B62D1F849": "Ijasah",
 }
 
-COCDocId_to_specificCOCIDid_mapping = {
+COCDocId_to_specificCOCId_mapping = {
     "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42": 17,
     "A80303C3-56E5-4463-96C6-F46B62D1F849CCD231DF-51D6-4F57-B9A4-E7AC91DAE096": 14,
     "A80303C3-56E5-4463-96C6-F46B62D1F84914E1BD41-BF82-4BEF-9102-7558FF91EFF0": 1,
@@ -562,7 +562,7 @@ def crewing_employeeCOCDoc():
                 "EmployeeId": row["CrewId"], 
                 "COCName": COCName,
                 "COCNumber": row["Nomor"] if row["Nomor"] else None,
-                "COCId": COCDocId_to_specificCOCIDid_mapping.get(f"{row['DocId']}{row['IjasahId'] or ''}", None),
+                "COCId": COCDocId_to_specificCOCId_mapping.get(f"{row['DocId']}{row['IjasahId'] or ''}", None),
                 "COCPublishedDate": convert_to_iso(row["Issued"]) if row["Issued"] else None,  
                 "COCExpiryDate": convert_to_iso(row["Expired"]) if row["Expired"] else None,  
                 "COCDescription": row["Description"] if row["Description"] else None, 
@@ -594,9 +594,9 @@ COPuuid_to_docName_mapping = {
     "5EF1B87F-8B21-44D8-8140-23787CF72136": "AOT",
     "8FB09090-84B4-4681-934A-2951BDF4E956": "MCU",
     "16D9F5F9-B205-4DAA-A005-30335742D366": "ACT",
-    "5B72E1B7-0AED-4DD0-80F2-34EEC5200075": "LeaderShip & TeamWork",
+    "5B72E1B7-0AED-4DD0-80F2-34EEC5200075": "Leadership & Teamwork Training",
     "5E2E3754-0B1A-434B-9260-3765DCC77932": "SSO",
-    "8FBBF102-FE02-4300-B551-3AAE52D72417": "RAGGER",
+    "8FBBF102-FE02-4300-B551-3AAE52D72417": "RANGGER",
     "9152179F-120D-4153-B4D7-3C33B28AEC25": "AFF",
     "95020C92-C922-44FF-82EF-47CC21207058": "MFA",
     "AF74F4BC-0DE7-446F-8597-47F9AE37C1E3": "SCRB",
@@ -613,8 +613,40 @@ COPuuid_to_docName_mapping = {
     "BEF454D7-C17D-4C1C-AC60-F00AA0EAB55B": "BLGT",
 }
 
+COPDocId_to_specificCOPId_mapping = {
+    "16D9F5F9-B205-4DAA-A005-30335742D366": 24,
+    "9152179F-120D-4153-B4D7-3C33B28AEC25": 2,
+    "E0B19778-03DD-4ADB-9AFC-E94F09F87085": 28,
+    "5EF1B87F-8B21-44D8-8140-23787CF72136": 23,
+    "E7572546-BD95-4E95-85B9-1F44A202F93C": 7,
+    "BEF454D7-C17D-4C1C-AC60-F00AA0EAB55B": 27,
+    "6353E8E2-6063-49E3-AED4-0D8C5B786ABA": 22,
+    "3D175A25-51DD-4017-97C3-BCD09464547A": 17,
+    "C5D2F351-7792-4266-A3A0-136AF4DB0C52": 1,
+    "7ED3D551-2332-40F2-9BE5-6C8F846D1B62": 26,
+    "481F87FA-3231-4338-BC9C-B2314ED799D1": 10,
+    "07FCD3DC-3FDB-44E7-96A1-778C95273EF8": 18,
+    "E895635D-DE1F-450B-8802-565F993DE9E8": 11,
+    "A4BEBC3F-2EDE-47D2-B3D8-98CEC75F7BFE": 8,
+    "5B72E1B7-0AED-4DD0-80F2-34EEC5200075": 30,
+    "B80D3BD7-34F5-4BAA-84AF-0C1FF272A02B": 5,
+    "95020C92-C922-44FF-82EF-47CC21207058": 4,
+    "72C621FC-4ED9-4CCF-BE1F-0FA161C5B317": 9,
+    "EA866E65-0B62-4622-91C5-0E13E4CDC660": 6,
+    "8FBBF102-FE02-4300-B551-3AAE52D72417": 13,
+    "84E7E966-16A9-4124-A58C-D8F60FD2AD6D": 25,
+    "AF74F4BC-0DE7-446F-8597-47F9AE37C1E3": 3,
+    "89384A94-B3D8-4FAE-8EE6-A6FF7095DF69": 19,
+    "5E2E3754-0B1A-434B-9260-3765DCC77932": 21
+}
+
 def crewing_employeeCOPDoc():
-    df = ExtractRepository.get_registerDoc() 
+    df = ExtractRepository.get_registerDoc()
+    df = df[
+        (df["DocId"] != "17DDBD73-5DC1-44E7-8206-BEDD6E6EA9DF") &
+        (df["DocId"] != "47CA7D1A-201F-42EA-B75C-1FB95E1CACF4") &
+        (df["DocId"] != "E40434B3-A5AD-4A0B-9F6D-12E37C1BC752") &
+        (df["DocId"] != "F9B89D2B-7753-4917-85B7-0F1C45BB5CC1")]
     df_cE = LogRepository.get_crewing_employee()
     df_cE = pd.DataFrame([dict(item) for item in df_cE])
     data = []
@@ -628,7 +660,7 @@ def crewing_employeeCOPDoc():
                 "EmployeeId": row["CrewId"],
                 "COPName": COPName,
                 "COPNumber": row["Nomor"] if row["Nomor"] else None,
-                "COPId": None,
+                "COPId": COPDocId_to_specificCOPId_mapping.get(row["DocId"], None),
                 "COPPublishedDate": convert_to_iso(row["Issued"]) if row["Issued"] else None,  
                 "COPExpiryDate": convert_to_iso(row["Expired"]) if row["Expired"] else None,  
                 "COPDescription": row["Description"] if row["Description"] else None, 

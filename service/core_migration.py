@@ -250,7 +250,7 @@ class Migrate:
     #                 # prisma.crewing_employee.create(data=row)
     #                 prisma.crewing_employee.update(
     #                     where={"Id": row["Id"]},
-    #                     data={"Gender": row["Gender"], "SeaFarerId": row["SeaFarerId"]}
+    #                     data={"PhoneNo": row["PhoneNo"]}
     #                 )
     #                 log_migrate.info(f"[Updated] Data Employee baris ke-{index}")
     #             except Exception as item_error:
@@ -283,25 +283,26 @@ class Migrate:
     #     finally:
     #         prisma.disconnect()
 
-    # @staticmethod
-    # @priority(14)
-    # def crewing_employeeCOPDoc():
-    #     prisma = Prisma()
-    #     prisma.connect()
-    #     try:
-    #         final_data = service.transform.crewing_employeeCOPDoc()
-    #         prisma.crewing_employeecopdoc.delete_many()
-    #         for index, row in enumerate(final_data, start=1):
-    #             try:
-    #                 prisma.crewing_employeecopdoc.create(data=row)
-    #                 log_migrate.info(f"[Created] Data Employee COP Doc baris ke-{index}")
-    #             except Exception:
-    #                 continue
-    #         log_migrate.info(f"[Migrated] {len(final_data)} Data Employee COP Doc")
-    #     except Exception as e:
-    #         log_migrate.error(f"Error saat memasukkan data Employee COP Doc: {e}")
-    #     finally:
-    #         prisma.disconnect()
+    @staticmethod
+    @priority(14)
+    def crewing_employeeCOPDoc():
+        prisma = Prisma()
+        prisma.connect()
+        try:
+            final_data = service.transform.crewing_employeeCOPDoc()
+            prisma.crewing_employeecopdoc.delete_many()
+            for index, row in enumerate(final_data, start=1):
+                try:
+                    prisma.crewing_employeecopdoc.create(data=row)
+                    log_migrate.info(f"[Created] Data Employee COP Doc baris ke-{index}")
+                except Exception as e:
+                    log_migrate.error(f"Error saat membuat data Employee COP Doc: {e}")
+                    continue
+            log_migrate.info(f"[Migrated] {len(final_data)} Data Employee COP Doc")
+        except Exception as e:
+            log_migrate.error(f"Error saat memasukkan data Employee COP Doc: {e}")
+        finally:
+            prisma.disconnect()
 
     # @staticmethod
     # @priority(15)
@@ -438,26 +439,26 @@ class Migrate:
     #     finally:
     #         prisma.disconnect()
 
-    @staticmethod
-    @priority(22)
-    def update_employeeShipId():
-        prisma = Prisma()
-        prisma.connect()
-        try:
-            final_data = service.transform.update_employeeShipId()
-            for index, row in enumerate(final_data, start=1):
-                try:
-                    prisma.crewing_employee.update(
-                        where={"Id": row["Id"]},  # Gunakan kunci unik dari tabel Anda
-                        data={"ShipId": row["ShipId"]}  # Data yang diperbarui
-                    )
-                    log_migrate.info(f"[Updated] Data Employee ShipId baris ke-{index}")
-                except Exception as item_error:
-                    log_migrate.error(f"Error saat memperbarui data Employee ShipId: {item_error} | Data: {row}")
-        except Exception as e:
-            log_migrate.error(f"Error saat memperbarui data Employee ShipId: {e}")
-        finally:
-            prisma.disconnect()
+    # @staticmethod
+    # @priority(22)
+    # def update_employeeShipId():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.update_employeeShipId()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employee.update(
+    #                     where={"Id": row["Id"]},  # Gunakan kunci unik dari tabel Anda
+    #                     data={"ShipId": row["ShipId"]}  # Data yang diperbarui
+    #                 )
+    #                 log_migrate.info(f"[Updated] Data Employee ShipId baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat memperbarui data Employee ShipId: {item_error} | Data: {row}")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memperbarui data Employee ShipId: {e}")
+    #     finally:
+    #         prisma.disconnect()
 
     # @staticmethod
     # @priority(23)
