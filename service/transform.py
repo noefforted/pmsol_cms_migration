@@ -521,8 +521,22 @@ def crewing_employee():
     return data
 
 COCuuid_to_docName_mapping = {
-    "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42": "Endorse Ijasah",
-    "A80303C3-56E5-4463-96C6-F46B62D1F849": "Ijasah",
+    "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42": "ENDORSEMENT",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849": "Ijazah (tipe ijazah tidak diketahui)",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849CCD231DF-51D6-4F57-B9A4-E7AC91DAE096": "RASD",
+    "A80303C3-56E5-4463-96C6-F46B62D1F84914E1BD41-BF82-4BEF-9102-7558FF91EFF0": "DOC I",
+    "A80303C3-56E5-4463-96C6-F46B62D1F8495200306F-B1AC-4DEB-92BE-D2EE3273C34B": "DOC II",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849E479D469-C902-4944-815F-78F443B8AD2F": "DOC III",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849BC36EF55-61B7-46D2-9149-2EBE416907DE": "DOC IV",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849DEC6B749-F9DA-47CC-8E3C-37EFCC01E0B4": "DOC V",
+    "A80303C3-56E5-4463-96C6-F46B62D1F84946926539-9F5D-4040-ACF4-025FC066C2F3": "RASE",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849B1D8F01F-AD1C-4451-BCF9-31641B5D8621": "EOC I",
+    "A80303C3-56E5-4463-96C6-F46B62D1F8491241A596-2A01-4DFB-B3E2-E12434752944": "EOC II",
+    "A80303C3-56E5-4463-96C6-F46B62D1F8490BD4BAAB-C009-44F4-8267-E8DCE4F4D381": "EOC III",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849CE4C72A8-0391-4E5A-8F44-135C3B6A5F69": "EOC IV",
+    "A80303C3-56E5-4463-96C6-F46B62D1F8493BAD689A-3B60-46FA-BE2E-3D09AF6EA892": "EOC V",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849A912D717-24F2-4B69-AB98-BAA2778E8022": "RASD",
+    "A80303C3-56E5-4463-96C6-F46B62D1F849C545718B-8001-43F2-BF41-6DDFD246BB0C": "RASE"
 }
 
 COCDocId_to_specificCOCId_mapping = {
@@ -554,7 +568,7 @@ def crewing_employeeCOCDoc():
     data = []
     for i, row in df.iterrows():
         try:
-            COCName = COCuuid_to_docName_mapping.get(row["DocId"], None)
+            COCName = COCuuid_to_docName_mapping.get(f"{row['DocId']}{row['IjasahId'] or ''}", None)
             if not COCName:
                 continue
             transformed_data = {
@@ -598,13 +612,13 @@ COPuuid_to_docName_mapping = {
     "5E2E3754-0B1A-434B-9260-3765DCC77932": "SSO",
     "8FBBF102-FE02-4300-B551-3AAE52D72417": "RANGGER",
     "9152179F-120D-4153-B4D7-3C33B28AEC25": "AFF",
-    "95020C92-C922-44FF-82EF-47CC21207058": "MFA",
+    "95020C92-C922-44FF-82EF-47CC21207058": "MEFA",
     "AF74F4BC-0DE7-446F-8597-47F9AE37C1E3": "SCRB",
     "E895635D-DE1F-450B-8802-565F993DE9E8": "FRC",
     "7ED3D551-2332-40F2-9BE5-6C8F846D1B62": "CTSTP",
     "07FCD3DC-3FDB-44E7-96A1-778C95273EF8": "ERM",
     "A4BEBC3F-2EDE-47D2-B3D8-98CEC75F7BFE": "GMDSS",
-    "89384A94-B3D8-4FAE-8EE6-A6FF7095DF69": "SDSD & SAT",
+    "89384A94-B3D8-4FAE-8EE6-A6FF7095DF69": "SDSD",
     "481F87FA-3231-4338-BC9C-B2314ED799D1": "ECDIS",
     "3D175A25-51DD-4017-97C3-BCD09464547A": "BRM",
     "17DDBD73-5DC1-44E7-8206-BEDD6E6EA9DF": "Approval BOC Pertamina",
@@ -646,7 +660,12 @@ def crewing_employeeCOPDoc():
         (df["DocId"] != "17DDBD73-5DC1-44E7-8206-BEDD6E6EA9DF") &
         (df["DocId"] != "47CA7D1A-201F-42EA-B75C-1FB95E1CACF4") &
         (df["DocId"] != "E40434B3-A5AD-4A0B-9F6D-12E37C1BC752") &
-        (df["DocId"] != "F9B89D2B-7753-4917-85B7-0F1C45BB5CC1")]
+        (df["DocId"] != "A80303C3-56E5-4463-96C6-F46B62D1F849") &
+        (df["DocId"] != "F9B89D2B-7753-4917-85B7-0F1C45BB5CC1") &
+        (df["DocId"] != "8FB09090-84B4-4681-934A-2951BDF4E956") &
+        (df["DocId"] != "B2BD57D7-925B-4221-897C-B84E4E4DE69D") &
+        (df["DocId"] != "169736ED-67BC-4519-9862-E4F969516F01") &
+        (df["DocId"] != "DD9AB9B9-E4F7-4174-80A2-3CC04D961A42")]
     df_cE = LogRepository.get_crewing_employee()
     df_cE = pd.DataFrame([dict(item) for item in df_cE])
     data = []
@@ -820,6 +839,12 @@ def crewing_employeeSeaService():
 
     return data
 
+trainingId_to_trainingCategory_mapping = {
+    1: "Hard Skill",
+    2: "Soft Skill",
+    3: "Other Skill"
+}
+
 
 def crewing_employeeTraining():
     df = ExtractRepository.get_RegisterTraining()
@@ -833,7 +858,7 @@ def crewing_employeeTraining():
                 "EmployeeId": row["CrewId"].lower(),
                 "TrainingInstitution": row["Institution"] if row["Institution"] else None,
                 "TrainingPosition": row["TrainingName"] if row["TrainingName"] else None,
-                "TrainingCategory": str(row["TrainingCategoryId"]) if row["TrainingCategoryId"] else None,
+                "TrainingCategory": trainingId_to_trainingCategory_mapping.get(row["TrainingCategoryId"], None),
                 "TrainingInstructor": None if pd.isna(row["InstructorName"]) else row["InstructorName"],  
                 "TrainingFeedback": None if pd.isna(row["TrainingFeedBack"]) else row["TrainingFeedBack"],
                 "TrainingEval": None if pd.isna(row["Evaluation"]) else row["Evaluation"],
@@ -911,6 +936,54 @@ blacklistuuid_to_int_mapping = {
     "97F89829-AD8D-4C7C-9B44-1A6F9C6733CC": 2,
     "8E167EFA-FBC3-49B6-BF87-7DC30FEE6E78": 4,
 }
+
+mapping_JobPositionMarineId = {
+    1: None,  # Director (Tidak ada padanan yang sesuai)
+    2: None,  # Vp/Head of Auditor/Director AP (Tidak ada padanan yang sesuai)
+    3: None,  # Manager/Senior Auditor/Ka. Cabang (Tidak ada padanan yang sesuai)
+    4: None,  # Ast. Manager/Auditor (Tidak ada padanan yang sesuai)
+    5: None,  # Assistant/Junior Auditor (Tidak ada padanan yang sesuai)
+    6: None,  # Kontrak (Tidak ada padanan yang sesuai)
+    7: None,  # Outsourcing (Tidak ada padanan yang sesuai)
+    8: 1,  # MASTER → NAKHODA
+    9: 2,  # CHIEF OFFICER → MUALIM I
+    10: 3,  # 2ND OFFICER → MUALIM II
+    11: 4,  # 3RD OFFICER → MUALIM III
+    12: 5,  # CHIEF ENGINEER → KKM
+    13: 7,  # 2ND ENGINEER → MASINIS II
+    14: 8,  # 3RD ENGINEER → MASINIS III
+    15: 9,  # 4TH ENGINEER → MASINIS IV
+    16: 12,  # A/B → JURU MUDI
+    17: 13,  # OILER → JURU MINYAK
+    18: 19,  # PUMP MAN → JURU POMPA
+    19: 11,  # BOSUN → BOSUN
+    20: 17,  # JURAGAN → SKIPPER
+    21: 18,  # MANDOR → MANDOR MESIN (ENGINE FOREMAN)
+    22: 16,  # MESS MAN (Tidak ada padanan yang sesuai)
+    23: 15,  # FITTER → FITTER
+    24: 14,  # KOKI → JURU MASAK (COOK)
+    25: 10,  # ELECTRICIAN → ELECTRICIAN
+    26: 32,  # ASESOR TCMS/CMMS (Tidak ada padanan yang sesuai)
+    27: 33,  # TS SHIP MANAGEMENT TYM (Tidak ada padanan yang sesuai)
+    28: 34   # ASESOR HSSE (Tidak ada padanan yang sesuai)
+}
+
+def update_JobPositionMarineId():
+    # Ambil data dari repository
+    df = ExtractRepository.get_RegisterCrew()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],
+                "JobPositionMarineId": mapping_JobPositionMarineId.get(row["PositionId"], None)
+            }
+            log_transform.info(f"[Transformed] Data RegisterCrew baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
+    return data
+
 
 def crewing_employeeBlacklist():
     df = ExtractRepository.get_RegisterCrew()

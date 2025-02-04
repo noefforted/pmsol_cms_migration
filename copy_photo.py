@@ -42,7 +42,7 @@ def copy_photo():
             row2 = matching_rows.iloc[0]
             
             # Ambil informasi folder tujuan
-            destination_base = "/media/ahmadaufa/J Gab/SuperApp_Files_Fix/personaldata"
+            destination_base = "/media/ahmadaufa/J Gab/NAHKODA_Files/personaldata"
             destination_folder = os.path.join(destination_base, row2['RegPhotoId'])
             
             # Jika folder tujuan tidak ada, skip

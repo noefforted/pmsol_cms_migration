@@ -72,3 +72,9 @@ class ExtractRepository:
         file_path = os.getenv("MAPPINGSIPTOVESS_FILE_PATH", "./data_source/updated_ship_data.csv")
         data = pd.read_csv(file_path)
         return data
+    
+    @staticmethod
+    def get_TrainingCategory():
+        file_path = os.getenv("TRAININGCATEGORY_FILE_PATH", "./data_source/CorePTKDb.TrainingCategory.csv")
+        data = pd.read_csv(file_path)
+        return data

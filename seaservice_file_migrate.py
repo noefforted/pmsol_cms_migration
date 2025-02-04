@@ -6,7 +6,7 @@ from repository.extract_repository import ExtractRepository
 def copy_files_based_on_employee_and_userdoc():
     # Path sumber dan tujuan
     source_path = "/media/ahmadaufa/J Gab/FileUpload/F7PQ3azX7krRqesRDEYA/Documents/Sertifikat"
-    destination_root = "/media/ahmadaufa/J Gab/SuperApp_Files_Fix/personaldata"
+    destination_root = "/media/ahmadaufa/J Gab/NAHKODA_Files/seaservice"
 
     # Inisialisasi Prisma
     db = Prisma()
@@ -18,9 +18,9 @@ def copy_files_based_on_employee_and_userdoc():
         df2 = ExtractRepository.get_registerDoc()
         df2 = df2[df2["CrewId"].notnull() & (df2["CrewId"] != "")]
 
-        # Filter df1 untuk DocType tertentu
-        target_doc_type = "52192E8F-CFEE-4D45-92E1-B8CAF8897F92"
-        filtered_doc_ids = df1[df1["DocType"] == target_doc_type]["DocId"].tolist()
+        # Filter df1 untuk DocName tertentu
+        target_doc_type = "SEA MAN BOOK"
+        filtered_doc_ids = df1[df1["DocName"] == target_doc_type]["DocId"].tolist()
         # print(f"Filtered DocIds: {filtered_doc_ids}")
 
         if not filtered_doc_ids:
@@ -43,20 +43,19 @@ def copy_files_based_on_employee_and_userdoc():
             user_doc_id = row["UserDocId"]
 
             search_pattern = f"{employee_id}{user_doc_id}"
-            coc_row = db.crewing_employeecocdoc.find_first(where={"EmployeeId": employee_id,
-                                                                  "OR": [{"COCName": "PASPORT"},{"COCName": "SEA MAN BOOK"}]})
+            match_row = db.crewing_employeeseaservice.find_first(where={"EmployeeId": employee_id})
 
 
-            if not coc_row or not coc_row.COCAttachment:
+            if not match_row or not match_row.SeaServiceAttachment:
                 print(f"No COCRow found for EmployeeId {employee_id}")
                 continue
 
             # print(f"Searching for {search_pattern} in {source_path}...")
 
-            coc_attachment = coc_row.COCAttachment
+            seaservice_attachment = match_row.SeaServiceAttachment
 
             # Folder tujuan
-            destination_path = os.path.join(destination_root, coc_attachment)
+            destination_path = os.path.join(destination_root, seaservice_attachment)
             os.makedirs(destination_path, exist_ok=True)
 
             # Normalisasi pola pencarian dan nama file
