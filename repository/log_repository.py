@@ -27,6 +27,14 @@ class LogRepository:
         return data
     
     @staticmethod
+    def get_crewing_jobPositionTanker():
+        prisma = Prisma()
+        prisma.connect()
+        data = prisma.crewing_jobpositiontanker.find_many()
+        prisma.disconnect()
+        return data
+    
+    @staticmethod
     def get_crewing_employee():
         prisma = Prisma()
         prisma.connect()

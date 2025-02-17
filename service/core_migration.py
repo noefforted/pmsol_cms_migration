@@ -501,24 +501,83 @@ class Migrate:
     #     finally:
     #         prisma.disconnect()
 
+    # @staticmethod
+    # @priority(25)
+    # def update_JobPositionMarineId():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.update_JobPositionMarineId()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employee.update(
+    #                     where={"Id": row["Id"]},  # Gunakan kunci unik dari tabel Anda
+    #                     data={"JobPositionMarineId": row["JobPositionMarineId"]}  # Data yang diperbarui
+    #                 )
+    #                 log_migrate.info(f"[Updated] Data Employee JobPositionMarineId baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat memperbarui data Employee JobPositionMarineId: {item_error} | Data: {row}")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memperbarui data Employee JobPositionMarineId: {e}")
+    #     finally:
+    #         prisma.disconnect()
+
+    # @staticmethod
+    # @priority(26)
+    # def update_JobPositionMarineId_BS():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.update_JobPositionMarineId_BS()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employee.update(
+    #                     where={"EmployeeId": row["Id"]},  # Gunakan kunci unik dari tabel Anda
+    #                     data={"JobPositionMarineId": row["JobPositionMarineId"]}  # Data yang diperbarui
+    #                 )
+    #                 log_migrate.info(f"[Updated] Data Employee JobPositionMarineId baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat memperbarui data Employee JobPositionMarineId: {item_error} | Data: {row}")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memperbarui data Employee JobPositionMarineId: {e}")
+    #     finally:
+    #         prisma.disconnect()
+
+    # @staticmethod
+    # @priority(27)
+    # def crewTanker():
+    #     prisma = Prisma()
+    #     prisma.connect()
+    #     try:
+    #         final_data = service.transform.crewTanker()
+    #         for index, row in enumerate(final_data, start=1):
+    #             try:
+    #                 prisma.crewing_employee.create(data=row)
+    #                 log_migrate.info(f"[Created] Data Crew Tanker baris ke-{index}")
+    #             except Exception as item_error:
+    #                 log_migrate.error(f"Error saat membuat data Crew Tanker: {item_error} | Data: {row}")
+    #     except Exception as e:
+    #         log_migrate.error(f"Error saat memasukkan data Crew Tanker: {e}")
+    #     finally:
+    #         prisma.disconnect()
+            
     @staticmethod
-    @priority(25)
-    def update_JobPositionMarineId():
+    @priority(24)
+    def TankerBoardSchedule():
         prisma = Prisma()
         prisma.connect()
         try:
-            final_data = service.transform.update_JobPositionMarineId()
+            final_data = service.transform.crewTankerBoardSchedule()
+            # prisma.crewing_employeeboardschedule.delete_many()
             for index, row in enumerate(final_data, start=1):
                 try:
-                    prisma.crewing_employee.update(
-                        where={"Id": row["Id"]},  # Gunakan kunci unik dari tabel Anda
-                        data={"JobPositionMarineId": row["JobPositionMarineId"]}  # Data yang diperbarui
-                    )
-                    log_migrate.info(f"[Updated] Data Employee JobPositionMarineId baris ke-{index}")
+                    prisma.crewing_employeeboardschedule.create(data=row)
+                    log_migrate.info(f"[Created] Data Employee Board Schedule baris ke-{index}")
                 except Exception as item_error:
-                    log_migrate.error(f"Error saat memperbarui data Employee JobPositionMarineId: {item_error} | Data: {row}")
+                    log_migrate.error(f"Error saat membuat data Employee Board Schedule: {item_error} | Data: {row}")
+            log_migrate.info(f"[Migrated] {len(final_data)} Data Employee Board Schedule")
         except Exception as e:
-            log_migrate.error(f"Error saat memperbarui data Employee JobPositionMarineId: {e}")
+            log_migrate.error(f"Error saat memasukkan data Employee Board Schedule: {e}")
         finally:
             prisma.disconnect()
 

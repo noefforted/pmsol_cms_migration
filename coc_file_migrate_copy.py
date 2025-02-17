@@ -22,41 +22,31 @@ COCuuid_to_docName_mapping = {
     "A80303C3-56E5-4463-96C6-F46B62D1F849C545718B-8001-43F2-BF41-6DDFD246BB0C": "RASE"
 }
 
-def copy_files_based_on_employee_and_userdoc():
-    # Path sumber dan tujuan
+def copy_latest_file():
     source_path = "/media/ahmadaufa/J Gab/FileUpload/F7PQ3azX7krRqesRDEYA/Documents/Sertifikat"
     destination_root = "/media/ahmadaufa/J Gab/NAHKODA_Files/coc"
 
-    # Inisialisasi Prisma
     db = Prisma()
     db.connect()
 
     try:
-        # Ambil data dari ExtractRepository
         df1 = ExtractRepository.get_mstDoc()
         df2 = ExtractRepository.get_registerDoc()
         df2 = df2[df2["CrewId"].notnull() & (df2["CrewId"] != "")]
 
-        # Filter df1 untuk DocName tertentu
         target_doc_type = "A12041A8-1A0F-4E01-A426-E1DBDF316613"
         filtered_doc_ids = df1[df1["DocType"] == target_doc_type]["DocId"].tolist()
-        # print(f"Filtered DocIds: {filtered_doc_ids}")
 
         if not filtered_doc_ids:
             print("No matching DocIds found in df1.")
             return
 
-        # Filter df2 berdasarkan DocId
         filtered_df2 = df2[df2["DocId"].isin(filtered_doc_ids)]
-        # print(f"Filtered df2: {filtered_df2}")
 
         if filtered_df2.empty:
             print("No matching rows found in df2.")
             return
 
-        # Ambil data dari database Prisma
-
-        # Iterasi setiap row dari filtered_df2
         for _, row in filtered_df2.iterrows():
             employee_id = row["CrewId"]
             user_doc_id = row["UserDocId"]
@@ -64,41 +54,36 @@ def copy_files_based_on_employee_and_userdoc():
             ijasah_id = row["IjasahId"]
             ijasah_name = COCuuid_to_docName_mapping.get(f"{doc_id}{ijasah_id}", None)
 
-            search_pattern = f"{employee_id}{user_doc_id}"
-            match_row = db.crewing_employeecocdoc.find_first(where={"EmployeeId": employee_id, "COCName": ijasah_name})
-
+            match_row = db.crewing_employeecocdoc.find_first(
+                where={"EmployeeId": employee_id, "COCName": ijasah_name}
+            )
 
             if not match_row or not match_row.COCAttachment:
                 print(f"No COCRow found for EmployeeId {employee_id}")
                 continue
 
-            # print(f"Searching for {search_pattern} in {source_path}...")
-
             COC_attachment = match_row.COCAttachment
-
-            # Folder tujuan
             destination_path = os.path.join(destination_root, COC_attachment)
             os.makedirs(destination_path, exist_ok=True)
 
-            # Normalisasi pola pencarian dan nama file
-            search_pattern = search_pattern.strip().lower()
+            search_pattern = f"{employee_id}{user_doc_id}".strip().lower()
+            matched_files = [
+                os.path.join(source_path, f)
+                for f in os.listdir(source_path)
+                if search_pattern in f.lower()
+            ]
 
-            for filename in os.listdir(source_path):
-                filename_normalized = filename.strip().lower()
-                
-                if search_pattern in filename_normalized:
-                    print(f"Found match: {filename}")
-                    source_file = os.path.join(source_path, filename)
-                    destination_file = os.path.join(destination_path, filename)
-                    shutil.copy2(source_file, destination_file)
-                    print(f"Copied {filename} to {destination_path}")
+            if matched_files:
+                latest_file = max(matched_files, key=os.path.getmtime)
+                destination_file = os.path.join(destination_path, os.path.basename(latest_file))
+                shutil.copy2(latest_file, destination_file)
+                print(f"Copied latest file {latest_file} to {destination_path}")
 
-        print("All files copied successfully.")
+        print("Latest files copied successfully.")
     except Exception as e:
         print(f"Error during file copy: {e}")
     finally:
         db.disconnect()
 
-# Panggil fungsi secara langsung
 if __name__ == "__main__":
-    copy_files_based_on_employee_and_userdoc()
+    copy_latest_file()

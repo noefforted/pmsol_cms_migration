@@ -78,3 +78,9 @@ class ExtractRepository:
         file_path = os.getenv("TRAININGCATEGORY_FILE_PATH", "./data_source/CorePTKDb.TrainingCategory.csv")
         data = pd.read_csv(file_path)
         return data
+    
+    @staticmethod
+    def get_crewTanker():
+        file_path = os.getenv("EMPLOYEE_TANKER_PATH", "./data_source/Book1(900).xlsx")
+        data = pd.read_excel(file_path, sheet_name='SampleData', dtype={'BPJS Kesehatan.No.': str, 'BPJS Ketenagakerjaan.No.': str})
+        return data

@@ -5,6 +5,7 @@ from repository.log_repository import LogRepository
 import pandas as pd
 import logging
 import random
+from datetime import datetime
 
 log_transform = logging.getLogger("Log Transform")
 
@@ -984,6 +985,22 @@ def update_JobPositionMarineId():
             log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
     return data
 
+def update_JobPositionMarineId_BS():
+    # Ambil data dari repository
+    df = LogRepository.get_crewing_employee()
+    df = pd.DataFrame([dict(item) for item in df])
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": row["Id"],
+                "JobPositionMarineId": None if pd.isna(row["JobPositionMarineId"]) else int(row["JobPositionMarineId"])
+            }
+            log_transform.info(f"[Transformed] Data RegisterCrew baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi RegisterCrew data baris ke-{i+1}: {transform_error}")
+    return data
 
 def crewing_employeeBlacklist():
     df = ExtractRepository.get_RegisterCrew()
@@ -1025,8 +1042,6 @@ def crewing_employeeBoardSchedule():
         (df["StatusRegister"] == "027C7105-0F55-44F1-A286-492BB8DDB8D8") |
         (df["StatusRegister"] == "6A422334-62D7-46CA-A07B-167E15690627") ]
     df2 = ExtractRepository.get_mappingShipToVessel()
-    data_cJPM = LogRepository.get_crewing_jobPositionMarine()
-    data_cJPM = pd.DataFrame([dict(item) for item in data_cJPM])
     data = []
     for i, row in df.iterrows():
         try:
@@ -1038,8 +1053,7 @@ def crewing_employeeBoardSchedule():
                 "OffBoardDate": convert_to_iso(row["OffBoard"]) if row["OffBoard"] else None,
                 "IsActive": activeStatusuuid_to_bool_mapping.get(row["StatusRegister"]),
                 "VesselId": df2.loc[df2["ShipId"] == row["ShipId"], "VesselId"].iloc[0] if not df2.loc[df2["ShipId"] == row["ShipId"]].empty else None,
-                "JobPositionMarineId": int(data_cJPM.loc[data_cJPM["Hierarchy"] == row["PositionId"], "JobPositionId"].iloc[0])
-                if not data_cJPM.loc[data_cJPM["Hierarchy"] == row["PositionId"]].empty else None,
+                "JobPositionMarineId": mapping_JobPositionMarineId.get(row["PositionId"], None),
                 "Created": datetime.now(),
                 "CreatedBy": "Migration",
                 "Modified": None,
@@ -1057,4 +1071,198 @@ def crewing_employeeBoardSchedule():
 
         except Exception as transform_error:
             log_transform.error(f"Error saat transformasi BoardSchedule data baris ke-{i+1}: {transform_error}")
+    return data
+
+bank_name_to_uuid_mapping = {
+    "MANDIRI/MDR-ID-JKT-0039": "3B9DF32A-AEE7-432C-9D4E-24AE970D64E2",
+    "BRI/BRI-ID-JKT-0045": "4ED6D9F7-9B86-401C-BD15-64315043FD0E",
+    "BCA/BCA-ID-JKT-0004": "95900ADD-5CD7-41DC-9750-86D674694B77",
+    "BNI/BNI-ID-JKT-0024": "412E9296-89A6-4657-99D2-27D322457E3D",
+    "BSI/BSI-ID-JKT-5502": "745E032D-27C6-43CD-BCC4-0EEAEEFCC277",
+    "BANK JAWA TENGAH": "65E59B9B-9F2A-4771-AF8C-680388578E3A",
+    "BTN": "FF0AB086-9C9D-4096-9699-0B00BB4C39C3",
+    "Maybank Jakarta": "8A0989CE-0E7C-4E6E-B701-5095E807A2EB",
+    "PANIN": "PANIN"
+}
+
+jenis_kapal_to_ship_id_mapping = {
+    "CHEMICAL": 5,
+    "OIL TANKER": 3,
+    "GAS TANKER ": 2
+}
+
+rank_to_jobPositionId_mapping = {
+    "Able Seaman": 16,
+    "Boatswain": 14,
+    "Chief Engineer": 2,
+    "Chief Officer": 3,
+    "Cook": 19,
+    "Electrician": 12,
+    "Electro Technical Officer": 12,
+    "Fitter": 13,
+    "Fourth Engineer": 10,
+    "Gas Engineer": 8,
+    "Master": 1,
+    "Messboy": 20,
+    "Oiler": 18,
+    "Ordinary Seaman": 17,
+    "Pumpman": 15,
+    "Second Engineer": 4,
+    "Second Officer": 5,
+    "Senior Deck Cadet": 7,
+    "Senior Engine Cadet": 11,
+    "Third Engineer": 9,
+    "Third Officer": 6
+}
+
+def crewTanker():
+    df = ExtractRepository.get_crewTanker()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "FullName": None if pd.isna(row["Name"]) else row["Name"],
+                "Address": None,
+                "Email": None if pd.isna(row["Email"]) else row["Email"],
+                "Gender": None if pd.isna(row["Gender"]) else row["Gender"],
+                "PlaceOfBirth": None if pd.isna(row["City Of Birth"]) else row["City Of Birth"],
+                "DateOfBirth": None if pd.isna(row["Date Of Birth"]) else row["Date Of Birth"],
+                "ReligionId": None,
+                "Nationality": "WNI",
+                "PhotoId": None,
+                "PassportPhotoId": None,
+                "KtpPhotoId": None,
+                "IdCardNo": None,
+                "IdPassport": None if pd.isna(row["Passport.No."]) else row["Passport.No."],
+                "FamilyCardNo": None if pd.isna(row["Family Register (KK).No."]) else row["Family Register (KK).No."],
+                "NPWP": None,
+                "BPJSKesNo": None if pd.isna(row["BPJS Kesehatan.No."]) else row["BPJS Kesehatan.No."],
+                "BPJSTKNo": None if pd.isna(row["BPJS Ketenagakerjaan.No."]) else row["BPJS Ketenagakerjaan.No."],
+                "PhoneNo": None,
+                "RelativesName": None if pd.isna(row["Full Name"]) else row["Full Name"],
+                "RelativesEmail": None if pd.isna(row["Email.1"]) else row["Email.1"],
+                "RelativesPhone": str(row["Mobile No."]).replace('(+62)', '0') if row["Mobile No."] else None,
+                "RelativesAddress": None if pd.isna(row["Address"]) else row["Address"],
+                "BankAccount1": None if pd.isna(row["Account Number"]) else str(row["Account Number"]),
+                "BankId1": bank_name_to_uuid_mapping.get(row["Bank Name"], "3B9DF32A-AEE7-432C-9D4E-24AE970D64E2"),
+                "BankAccountName1": None if pd.isna(row["Account Name"]) else row["Account Name"],
+                "BankAccount2": None,
+                "BankId2": None,
+                "BankAccountName2": None,
+                "DivisionId": 2,
+                "EmployeeIdNumber": None,
+                "OnBoardStatus": True if row["Planned sign off"] > datetime.now() else False,
+                "ShipId": jenis_kapal_to_ship_id_mapping.get(row["Jenis"], None),
+                "MaritalStatusId": None,
+                "SeaFarerId": None if pd.isna(row["Seafarer ID"]) else str(row["Seafarer ID"]),
+                "RegisterCrewId": None,
+                "IsResigned": False,
+                "EmploymentTypeId": '5E35841F-DEA8-4E72-B337-D3377E06A3BB' if row["Contract Status"] == "PWT" else '04AD0F4A-C8FD-4197-A520-613EDE0B57FA',
+                "JobPositionMarineId": None,
+                "JobPositionTankerId": rank_to_jobPositionId_mapping.get(row["Rank"], None),
+                "LastRejectedDate": None,
+                "WilingToAcceptLowerRank": None,
+                "AvailableForm": None,
+                "AvailableUntil": None,
+                "Weight": None,
+                "Height": None,
+                "BMI": None,
+                "SafetyShoesSize": None,
+                "TrousersSize": None,
+                "CoverallSize": None,
+                "ShirtSize": None,
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "IsDeleted": False,
+                "Modified": None,
+                "ModifiedBy": None,
+                "SeamanBookNo": None if pd.isna(row["Seaman's Book.No."]) else row["Seaman's Book.No."],
+            }
+            log_transform.info(f"[Transformed] Data Tanker baris ke-{i+1}")
+            data.append(transformed_data)
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi Tanker data baris ke-{i+1}: {transform_error}")
+    return data
+
+crewTanker_kapal_mapping = {
+    "GAS ARAR": "8748A4CF-254F-45A3-B79C-8432C0A51F05",
+    "GAS ARIMBI": "134F6E19-C0A5-4CAD-BF42-0BD77B1BB8DC",
+    "GAS ATTAKA": "B07100A1-7209-449D-B91A-1E03331C323D",
+    "GAS PATRA 2": "FFEF949B-A140-4467-B473-02280D886732",
+    "GAS PATRA 3": "0ABF12AA-6B00-4F72-B4FB-8175CB3B5BB4",
+    "GAS WALIO ": "BBCAF872-4982-4382-81A0-74A9639416E9",
+    "GAS WIDURI": "453F76DD-6ED5-49F2-B41F-2FBEB663FD2A",
+    "MT CENDRAWASIH": "BF85F4A5-D096-4773-8B2C-49E08C9E97B6",
+    "MT ENDURO": "3C032EE3-85FF-4B25-BF3C-2D60330FEDF7",
+    "MT FASTRON": "074CA89E-C50F-4E3B-AD07-03B9637074B3",
+    "MT GUNUNG KEMALA": "57EF88BC-42EA-470E-AE9F-92E837D81B6F",
+    "MT KAMOJANG": "DE674E03-7540-4B0A-978D-6816867D4F19",
+    "MT KATOMAS": "F1804ECC-A37A-4687-8491-1E40F6A4C296",
+    "MT KETALING": "1E6E50E0-DDF5-411D-A245-ED3FE9512868",
+    "MT KLAWOTONG": "0A650C9A-2A5F-405C-82BA-2AA230C654B6",
+    "MT KRASAK": "34C57CD9-21B1-4333-909A-13021012D9E8",
+    "MT KUANG": "11CFCCE4-E4D5-4772-9A7D-096797057A3B",
+    "MT MERAUKE": "BE878570-786A-4F13-8C19-A40748513C45",
+    "MT MUSI": "0BF5467B-30F5-4F30-84E0-3BC49EB39A83",
+    "MT PAGERUNGAN": "8534385C-1028-4204-9B14-8A56C65FAE40",
+    "MT PANDAN": "1965E6F0-AA98-41CE-8906-01823A3BABC1",
+    "MT PANGKALAN BRANDAN": "CD7BF292-1AA3-47A0-B6D3-04DD02219A9C",
+    "MT PASAMAN": "2DBF8D38-9112-48E0-BA33-83927829AAF2",
+    "MT SANGA SANGA": "8C094C0D-9AFB-4764-BC37-B10A93EE8129",
+    "MT SENGETI": "059CAB8D-BE41-4A69-B258-D985A0B57E5D",
+    "MT SEPINGGAN": "E4C0EBF0-1F18-41F7-8808-B32845780245",
+    "MT SERANG JAYA": "011F88F7-7315-418E-9148-DD773AFE7726",
+    "MT SUNGAI GERONG": "773BC877-A954-4F53-A361-943112F35948",
+    "PATRA TANKER 1": "904B2031-67F3-488F-A142-4BF7F3E7AA04",
+    "PATRA TANKER 2": "6E69D0D6-5251-4399-AC52-DA6EDA5E0657",
+    "PATRA TANKER 3": "EFD1B97B-D00F-490E-A028-43093A904476",
+    "PERTAMINA GAS 1": "44167575-0D2A-410B-A50C-882C0C72F9D9",
+    "PERTAMINA GAS 2": "8752BCF2-CC71-4EF7-BE22-BF2AC493BE4E",
+    "PIS MAHAKAM": "C5218FD2-8577-4675-91A6-3B0503876DC3",
+    "TRANSKO ANTASENA": "F9E5A593-E34B-4C3D-B8D1-5EC27F237077",
+    "TRANSKO AQUILA": "770C1A26-1E77-48A2-92E5-CE574DF24CAA",
+    "TRANSKO ARAFURA": "C2E1BEC7-D11A-4E4E-85E9-64F198AF8A8D",
+    "TRANSKO ARIES": "76E959ED-299C-4B0A-B4D1-AAB5DA2CFBB5",
+    "TRANSKO BIMA": "5FF64CF1-0533-4A27-8C01-CF948810D291",
+    "TRANSKO TAURUS": "1789ADED-BECD-4BC0-88CD-796DE3B863CF",
+    "MT KAKAP": "9565D20A-D383-4A3B-992E-D28F20AD0554",
+    "MT PARIGI": "4F522724-4FFF-4771-AAA5-1F8C8F60B4B7",
+    "MT SEI PAKNING": "EBB69FD6-B4B3-4984-BC9B-7F423F424D9A",
+    "Pertamina Gas Dahlia": "3ADA89AD-EF28-4F92-915E-45E9CD257A61"
+}
+
+def crewTankerBoardSchedule():
+    df = ExtractRepository.get_crewTanker()
+    df_emp = LogRepository.get_crewing_employee()
+    df_emp = pd.DataFrame([dict(item) for item in df_emp])
+    df2 = ExtractRepository.get_mappingShipToVessel()
+    data = []
+    for i, row in df.iterrows():
+        try:
+            # Membuat transformed_data
+            transformed_data = {
+                "Id": str(uuid.uuid4()),
+                "EmployeeId": df_emp.loc[df_emp["FullName"] == row["Name"], "Id"].iloc[0] if not df_emp.loc[df_emp["FullName"] == row["Name"]].empty else None,
+                "OnBoardDate": None if pd.isna(row["Actual sign on"]) else row["Actual sign on"],
+                "OffBoardDate": None if pd.isna(row["Planned sign off"]) else row["Planned sign off"],
+                "IsActive": True,
+                "VesselId": crewTanker_kapal_mapping.get(row["Kapal"], None),
+                "JobPositionTankerId": rank_to_jobPositionId_mapping.get(row["Rank"], None),
+                "Created": datetime.now(),
+                "CreatedBy": "Migration",
+                "Modified": None,
+                "ModifiedBy": None,
+                "IsDeleted": False,
+                "IsOnBoard": True,
+                "OriginalOffBoardDate": None,
+            }
+            if transformed_data["EmployeeId"] and transformed_data["VesselId"]:
+                log_transform.info(f"[Transformed] Data BoardSchedule baris ke-{i+1}")
+                data.append(transformed_data)
+            else:
+                log_transform.warning(f"Data baris ke-{i+1} di-skip karena EmployeeId atau VesselId tidak valid")
+
+        except Exception as transform_error:
+            log_transform.error(f"Error saat transformasi BoardSchedule data baris ke-{i+1}: {transform_error} | Data: {row}")
     return data
