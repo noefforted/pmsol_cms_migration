@@ -1088,24 +1088,32 @@ bank_name_to_uuid_mapping = {
 jenis_kapal_to_ship_id_mapping = {
     "CHEMICAL": 5,
     "OIL TANKER": 3,
-    "GAS TANKER ": 2
+    "GAS TANKER": 2
 }
 
 rank_to_jobPositionId_mapping = {
     "Able Seaman": 16,
+    "Able Bodied Seaman": 16,
+    "AB": 16,
+    "Ab": 16,
     "Boatswain": 14,
+    "Bosun": 14,
+    "Chief Cook": 19,
     "Chief Engineer": 2,
     "Chief Officer": 3,
     "Cook": 19,
     "Electrician": 12,
     "Electro Technical Officer": 12,
     "Fitter": 13,
+    "Wiper": 13,
     "Fourth Engineer": 10,
     "Gas Engineer": 8,
     "Master": 1,
     "Messboy": 20,
+    "Messman": 20,
     "Oiler": 18,
     "Ordinary Seaman": 17,
+    "OS": 17,
     "Pumpman": 15,
     "Second Engineer": 4,
     "Second Officer": 5,
@@ -1145,14 +1153,14 @@ def crewTanker():
                 "RelativesPhone": str(row["Mobile No."]).replace('(+62)', '0') if row["Mobile No."] else None,
                 "RelativesAddress": None if pd.isna(row["Address"]) else row["Address"],
                 "BankAccount1": None if pd.isna(row["Account Number"]) else str(row["Account Number"]),
-                "BankId1": bank_name_to_uuid_mapping.get(row["Bank Name"], "3B9DF32A-AEE7-432C-9D4E-24AE970D64E2"),
+                "BankId1": bank_name_to_uuid_mapping.get(row["Bank Name"], None),
                 "BankAccountName1": None if pd.isna(row["Account Name"]) else row["Account Name"],
                 "BankAccount2": None,
                 "BankId2": None,
                 "BankAccountName2": None,
                 "DivisionId": 2,
                 "EmployeeIdNumber": None,
-                "OnBoardStatus": True if row["Planned sign off"] > datetime.now() else False,
+                "OnBoardStatus": False,
                 "ShipId": jenis_kapal_to_ship_id_mapping.get(row["Jenis"], None),
                 "MaritalStatusId": None,
                 "SeaFarerId": None if pd.isna(row["Seafarer ID"]) else str(row["Seafarer ID"]),
@@ -1186,13 +1194,21 @@ def crewTanker():
     return data
 
 crewTanker_kapal_mapping = {
+    "GAS AMBALAT": "69F4F8C1-1235-4EBB-ADA9-01A3D20197B9",
+    "GAS ANTASENA": "0B2B9225-49E0-4FBB-B70F-5E6389369372",
     "GAS ARAR": "8748A4CF-254F-45A3-B79C-8432C0A51F05",
     "GAS ARIMBI": "134F6E19-C0A5-4CAD-BF42-0BD77B1BB8DC",
+    "GAS ARJUNA": "55D4C4F4-20EA-43B3-87B0-E615BE054D2C",
     "GAS ATTAKA": "B07100A1-7209-449D-B91A-1E03331C323D",
     "GAS PATRA 2": "FFEF949B-A140-4467-B473-02280D886732",
     "GAS PATRA 3": "0ABF12AA-6B00-4F72-B4FB-8175CB3B5BB4",
     "GAS WALIO ": "BBCAF872-4982-4382-81A0-74A9639416E9",
     "GAS WIDURI": "453F76DD-6ED5-49F2-B41F-2FBEB663FD2A",
+    "GALUNGGUNG": "617E9D26-12B4-4C6F-A052-E6B3C4681476",
+    "GAMALAMA": "546DB367-94B5-427B-AE09-0020EC4BFA7A",
+    "GAMKONORA": "EFBAA719-B0DC-4586-B78C-FDA4105CB553",
+    "GEDE": "D02EE3D4-7D21-4AB7-84F8-496DC7ADA28E",
+    "GUNUNG GEULIS": "8166B2B3-3FD9-46A2-B05A-A03F36A8840F",
     "MT CENDRAWASIH": "BF85F4A5-D096-4773-8B2C-49E08C9E97B6",
     "MT ENDURO": "3C032EE3-85FF-4B25-BF3C-2D60330FEDF7",
     "MT FASTRON": "074CA89E-C50F-4E3B-AD07-03B9637074B3",
@@ -1220,12 +1236,15 @@ crewTanker_kapal_mapping = {
     "PERTAMINA GAS 1": "44167575-0D2A-410B-A50C-882C0C72F9D9",
     "PERTAMINA GAS 2": "8752BCF2-CC71-4EF7-BE22-BF2AC493BE4E",
     "PIS MAHAKAM": "C5218FD2-8577-4675-91A6-3B0503876DC3",
+    "SANANA": "69F49497-8A06-4BC7-B6EB-C04B572D5B8D",
+    "SANGGAU": "3317AA69-5154-47A1-A0C8-0B6B04865121",
     "TRANSKO ANTASENA": "F9E5A593-E34B-4C3D-B8D1-5EC27F237077",
     "TRANSKO AQUILA": "770C1A26-1E77-48A2-92E5-CE574DF24CAA",
     "TRANSKO ARAFURA": "C2E1BEC7-D11A-4E4E-85E9-64F198AF8A8D",
     "TRANSKO ARIES": "76E959ED-299C-4B0A-B4D1-AAB5DA2CFBB5",
     "TRANSKO BIMA": "5FF64CF1-0533-4A27-8C01-CF948810D291",
     "TRANSKO TAURUS": "1789ADED-BECD-4BC0-88CD-796DE3B863CF",
+    "TRANSKO YUDHISTIRA": "F2590076-B2AB-4076-A51B-668324033AE3",
     "MT KAKAP": "9565D20A-D383-4A3B-992E-D28F20AD0554",
     "MT PARIGI": "4F522724-4FFF-4771-AAA5-1F8C8F60B4B7",
     "MT SEI PAKNING": "EBB69FD6-B4B3-4984-BC9B-7F423F424D9A",
@@ -1234,9 +1253,9 @@ crewTanker_kapal_mapping = {
 
 def crewTankerBoardSchedule():
     df = ExtractRepository.get_crewTanker()
+    # df = pd.read_excel("./data_source/800_kurang.xlsx")
     df_emp = LogRepository.get_crewing_employee()
     df_emp = pd.DataFrame([dict(item) for item in df_emp])
-    df2 = ExtractRepository.get_mappingShipToVessel()
     data = []
     for i, row in df.iterrows():
         try:

@@ -81,6 +81,6 @@ class ExtractRepository:
     
     @staticmethod
     def get_crewTanker():
-        file_path = os.getenv("EMPLOYEE_TANKER_PATH", "./data_source/Book1(900).xlsx")
-        data = pd.read_excel(file_path, sheet_name='SampleData', dtype={'BPJS Kesehatan.No.': str, 'BPJS Ketenagakerjaan.No.': str})
+        file_path = os.getenv("EMPLOYEE_TANKER_PATH", "./data_source/Book1(cc_janfebmar).xlsx")
+        data = pd.read_excel(file_path, sheet_name='CCFebMarLengkap', dtype={'BPJS Kesehatan.No.': str, 'BPJS Ketenagakerjaan.No.': str})
         return data

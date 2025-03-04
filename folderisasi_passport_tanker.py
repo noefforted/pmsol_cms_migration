@@ -8,7 +8,8 @@ def get_crew_tanker():
     prisma.connect()
 
     # Mengambil data crew berdasarkan FullName dan PassportPhotoId
-    crew_tanker = prisma.crewing_employee.find_many(where={"JobPositionTankerId": {"not": None}})
+    crew_tanker = prisma.crewing_employee.find_many(where={"JobPositionTankerId": {"not": None},
+                                                           "PhotoId": {"not": None}})
 
     prisma.disconnect()
     return crew_tanker
@@ -17,7 +18,7 @@ def get_crew_tanker():
 def create_folder_and_copy_photos(crew_tanker, source_base_dir, destination_base_dir):
     for crew in crew_tanker:
         # Mendapatkan nama crew dan PassportPhotoId
-        full_name = crew.FullName
+        full_name = (crew.FullName).lower()
         passport_id = crew.PassportPhotoId
 
         # Path folder baru yang akan dibuat berdasarkan PassportPhotoId
@@ -27,7 +28,7 @@ def create_folder_and_copy_photos(crew_tanker, source_base_dir, destination_base
         os.makedirs(new_folder_path, exist_ok=True)
 
         # Path sumber foto berdasarkan struktur folder yang diberikan
-        source_photo_path = os.path.join(source_base_dir, full_name, "personaldata", "passport")
+        source_photo_path = os.path.join(source_base_dir,  full_name.title(), "personaldata", "passport")
         
         # Mengecek apakah folder sumber ada
         if os.path.exists(source_photo_path):
@@ -48,7 +49,7 @@ def main():
     crew_tanker = get_crew_tanker()
 
     # Tentukan direktori sumber dan tujuan
-    source_base_dir = '/home/ahmadaufa/Downloads/Ready'
+    source_base_dir = '/home/ahmadaufa/Downloads/Ready_all'
     destination_base_dir = '/media/ahmadaufa/J Gab/NAKHODA_Files_Tanker/personaldata'
 
     # Buat folder dan salin foto
